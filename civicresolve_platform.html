@@ -1,0 +1,3302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CivicResolve | Citizen-to-Government Civic Grievance & Municipal Resolution Platform</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 for Crisp Civic & Municipal Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+    h1, h2, h3, .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(0.9); opacity: 0.85; }
+      70% { transform: scale(1.9); opacity: 0; }
+      100% { transform: scale(1.9); opacity: 0; }
+    }
+    .pin-pulse {
+      animation: pulseRing 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .page-transition {
+      animation: pageFadeIn 0.22s ease-out;
+    }
+    @media print {
+      body * { visibility: hidden; }
+      #printableReceiptArea, #printableReceiptArea * { visibility: visible; }
+      #printableReceiptArea { position: fixed; left: 0; top: 0; width: 100%; background: white; padding: 24px; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-blue-600 selection:text-white">
+
+  <!-- MAIN APPLICATION HEADER & SEPARATE PAGE NAVIGATION -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-between h-auto py-3 gap-3">
+        <!-- Brand Logo -->
+        <button type="button" onclick="navigateToPage('home')" class="flex items-center gap-3 text-left focus:outline-none group">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md shadow-blue-600/20 group-hover:scale-105 transition">
+            <i class="fa-solid fa-landmark-dome text-lg"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-display font-extrabold text-xl tracking-tight text-slate-900">Civic<span class="text-blue-600">Resolve</span></span>
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">Gemini AI</span>
+            </div>
+            <p class="text-xs text-slate-500 hidden sm:block" data-i18n="tagline">Transparent Citizen-to-Government Issue Resolution</p>
+          </div>
+        </button>
+
+        <!-- Primary Multi-Page Navigation Links -->
+        <nav class="flex flex-wrap items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+          <button onclick="navigateToPage('home')" id="navPageHome" class="px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+          </button>
+          <button onclick="navigateToPage('map')" id="navPageMap" class="px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 bg-white text-blue-700 shadow-sm">
+            <i class="fa-solid fa-map-location-dot"></i>
+            <span data-i18n="liveMap">Google Map</span>
+          </button>
+          <button onclick="navigateToPage('report')" id="navPageReport" class="px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span data-i18n="reportIssue">Report Issue</span>
+          </button>
+          <button onclick="navigateToPage('myissues')" id="navPageMyIssues" class="px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-clipboard-user"></i>
+            <span data-i18n="myAppliedComplaints">Issue Tracking</span>
+            <span id="myIssuesCountBadge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-700">0</span>
+          </button>
+          <button onclick="navigateToPage('feed')" id="navPageFeed" class="px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-bullhorn"></i>
+            <span data-i18n="publicFeed">Public Feed</span>
+          </button>
+          <button onclick="navigateToPage('authority')" id="navPageAuthority" class="px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-shield-halved text-amber-600"></i>
+            <span data-i18n="authorityDashboard">Admin Dashboard</span>
+            <span id="navEscalatedBadge" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-600 text-white">2</span>
+          </button>
+        </nav>
+
+        <!-- Language & Separate Citizen / Authority Login Controls -->
+        <div class="flex items-center gap-2">
+          <select id="languageSelector" onchange="changeLanguage(this.value)" aria-label="Language" class="px-2.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700 focus:outline-none">
+            <option value="en">EN</option>
+            <option value="ta">தமிழ்</option>
+            <option value="hi">हिंदी</option>
+          </select>
+
+          <div id="authHeaderControl" class="flex items-center gap-2">
+            <button onclick="openLoginModal('citizen')" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-user"></i>
+              <span>Citizen Login</span>
+            </button>
+            <button onclick="openLoginModal('admin')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-user-shield"></i>
+              <span>Admin Login</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <!-- MAIN SEPARATE-PAGE ROUTER CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- =================================================================== -->
+    <!-- PAGE 1: HOME OVERVIEW PAGE                                          -->
+    <!-- =================================================================== -->
+    <section id="pageHome" class="hidden page-transition space-y-6">
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950 text-white p-6 sm:p-10 shadow-xl border border-slate-800">
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-8 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-200 text-xs font-semibold">
+              <i class="fa-solid fa-sparkles text-amber-400"></i>
+              <span>Powered by Google Gemini AI Triage &amp; 48-Hour SLA Accountability</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight" data-i18n="heroTitle">
+              Spot a Civic Issue? Report It in 30 Seconds.
+            </h1>
+            <p class="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed" data-i18n="heroSubtitle">
+              Submit your civic complaint with title, description, location, category, and optional image. Google Gemini automatically classifies the category, detects priority urgency, and routes it to the right municipal department.
+            </p>
+            <div class="flex flex-wrap items-center gap-3 pt-1">
+              <button onclick="navigateToPage('report')" class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-lg shadow-blue-600/30 transition flex items-center gap-2">
+                <i class="fa-solid fa-camera"></i>
+                <span data-i18n="reportIssue">Report Issue</span>
+              </button>
+              <button onclick="openVoiceReportAssistant()" class="px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-sm shadow-lg shadow-amber-500/25 transition flex items-center gap-2">
+                <i class="fa-solid fa-microphone-lines"></i>
+                <span data-i18n="voiceQuickStart">Report by Voice Assistant</span>
+              </button>
+              <button onclick="navigateToPage('myissues')" class="px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white border border-white/15 font-semibold text-sm transition flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-emerald-400"></i>
+                <span>Track Issues</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 grid grid-cols-2 gap-3">
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+              <div class="text-xs text-blue-200 font-medium">Total Reported</div>
+              <div id="heroTotalIssues" class="text-2xl sm:text-3xl font-extrabold mt-1">5</div>
+              <div class="text-[11px] text-emerald-300 mt-1 flex items-center gap-1">
+                <i class="fa-solid fa-arrow-trend-up"></i> Live City Telemetry
+              </div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+              <div class="text-xs text-blue-200 font-medium">Resolved Rate</div>
+              <div id="heroResolvedRate" class="text-2xl sm:text-3xl font-extrabold mt-1 text-emerald-400">20%</div>
+              <div class="text-[11px] text-slate-300 mt-1">With Photo Proof</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+              <div class="text-xs text-blue-200 font-medium">High / Critical</div>
+              <div id="sidebarEscalatedCount" class="text-lg sm:text-xl font-extrabold mt-1 text-rose-400">2 Issues</div>
+              <div class="text-[11px] text-rose-200 mt-1">Gemini Priority</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4">
+              <div class="text-xs text-blue-200 font-medium">Your Impact Score</div>
+              <div id="citizenPointsDisplay" class="text-lg sm:text-xl font-extrabold mt-1 text-amber-300">140 pts</div>
+              <div class="text-[11px] text-amber-200 mt-1">Ward Guardian</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Portal Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-microchip"></i>
+          </div>
+          <h3 class="font-bold text-base text-slate-900">1. Gemini AI Classification</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Submit complaints with title, description, location, category, and optional image—Gemini AI auto-detects category, priority level, and target department.</p>
+          <div class="pt-1 flex gap-2">
+            <button onclick="navigateToPage('report')" class="px-3.5 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">Report Issue →</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <h3 class="font-bold text-base text-slate-900">2. Issue Tracking Dashboard</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Track every submitted complaint across Reported, In Progress, and Resolved statuses, see days existing, and print official receipts.</p>
+          <div class="pt-1">
+            <button onclick="navigateToPage('myissues')" class="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold">Open Tracking →</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm space-y-3">
+          <div class="w-11 h-11 rounded-xl bg-slate-900 text-amber-400 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-user-shield"></i>
+          </div>
+          <h3 class="font-bold text-base text-slate-900">3. Admin Resolution Dashboard</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">Municipal officers review prioritized tickets, update statuses (Reported → In Progress → Resolved), and archive Before/After evidence.</p>
+          <div class="pt-1">
+            <button onclick="openLoginModal('admin')" class="px-3.5 py-2 rounded-xl bg-slate-900 text-amber-300 text-xs font-bold">Admin Login →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PAGE 2: LIVE GOOGLE MAP & PROBLEM POINTERS PAGE                     -->
+    <!-- =================================================================== -->
+    <section id="pageMap" class="page-transition space-y-6">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="font-bold text-lg text-slate-900">Live Google Civic Map &amp; Problem Pointers</h2>
+            <p class="text-xs text-slate-500">Click any problem pointer on Google Maps or click any issue below to zoom directly to that street</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3 text-xs">
+            <select id="mapCategoryFilter" onchange="renderDigitalMap()" class="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-semibold text-slate-700">
+              <option value="ALL">All Categories</option>
+              <option value="Roads & Potholes">Roads &amp; Potholes</option>
+              <option value="Water & Drainage">Water &amp; Drainage</option>
+              <option value="Garbage & Sanitation">Garbage &amp; Sanitation</option>
+              <option value="Streetlights & Electricity">Streetlights &amp; Electricity</option>
+              <option value="Public Safety & Traffic">Public Safety &amp; Traffic</option>
+            </select>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span> Reported</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span> In Progress</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span> Resolved</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <div class="lg:col-span-8">
+            <div id="citizenDigitalMap" class="relative w-full h-[460px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 shadow-inner"></div>
+          </div>
+          <div class="lg:col-span-4 bg-slate-50 rounded-2xl border border-slate-200 p-4 flex flex-col justify-between">
+            <div id="mapInspectorContent" class="space-y-3">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Map Pin Inspector</div>
+              <p class="text-sm text-slate-600">Select any problem pointer on Google Maps or click any issue below to inspect Gemini priority details and zoom straight to that area.</p>
+            </div>
+            <div class="pt-4 border-t border-slate-200 mt-4">
+              <button onclick="navigateToPage('report')" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition">
+                + Report New Civic Issue
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clickable Directory of All Reported Problems Directly Below Map -->
+        <div class="pt-4 border-t border-slate-200">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-list-ul text-blue-600"></i>
+              <h3 class="font-bold text-sm text-slate-900">Reported Problems Directory — Click any problem to zoom Google Maps to that area</h3>
+            </div>
+            <span id="mapDirectoryCount" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">5 Issues</span>
+          </div>
+          <div id="citizenMapProblemsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PAGE 3: CITIZEN ISSUE REPORTING & GEMINI AI CLASSIFICATION          -->
+    <!-- =================================================================== -->
+    <section id="pageReport" class="hidden page-transition max-w-4xl mx-auto">
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900" data-i18n="reportIssue">Report New Civic Issue</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Google Gemini AI analyzes your complaint to classify category, detect priority urgency, and recommend the municipal department.</p>
+          </div>
+          <span class="px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-200 flex items-center gap-1.5">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Gemini 3 Flash Triage
+          </span>
+        </div>
+
+        <!-- AI VOICE COMPLAINT ASSISTANT CARD -->
+        <div class="mb-6 rounded-2xl bg-gradient-to-r from-indigo-950 via-blue-950 to-slate-900 text-white p-5 border border-blue-800/60 shadow-md">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-amber-400/20 border border-amber-400/40 text-amber-300 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-microphone-lines"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-sm font-extrabold text-white" data-i18n="voiceAssistantTitle">AI Voice Complaint Assistant</h3>
+                  <span id="voiceStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">Ready (EN / TA / HI)</span>
+                </div>
+                <p class="text-xs text-blue-200 mt-0.5">Speak your name, street location &amp; problem—AI auto-fills and classifies your complaint.</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="speakAssistantGuide()" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-blue-100 text-xs font-semibold border border-white/15 transition">
+                <i class="fa-solid fa-volume-high mr-1"></i> Voice Guide
+              </button>
+              <button type="button" onclick="toggleVoiceComplaintAssistant()" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold shadow-sm transition flex items-center gap-1.5">
+                <i class="fa-solid fa-microphone"></i>
+                <span id="voiceToggleBtnLabel">Start Speaking</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-3 p-3 rounded-xl bg-slate-950/60 border border-white/10 text-xs text-slate-200">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-300 block mb-1">Live Voice Transcript</span>
+            <p id="voiceTranscriptText" class="italic text-slate-300">"Tap 'Start Speaking' or click a quick sample voice complaint below..."</p>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+            <span class="text-blue-300 font-semibold">Try Voice Demo:</span>
+            <button type="button" onclick="simulateVoiceComplaint('pothole')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/15 transition">🛣️ "Deep pothole near RS Puram"</button>
+            <button type="button" onclick="simulateVoiceComplaint('water')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/15 transition">💧 "Water pipe burst on NSR Road"</button>
+            <button type="button" onclick="simulateVoiceComplaint('garbage')" class="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white border border-white/15 transition">🗑️ "Garbage overflow at Peelamedu"</button>
+          </div>
+        </div>
+
+        <form id="issueReportForm" onsubmit="handleIssueSubmit(event)" class="space-y-5">
+          <!-- CITIZEN DETAILS SECTION -->
+          <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs"><i class="fa-solid fa-user-check"></i></span>
+                <div>
+                  <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-900" data-i18n="citizenDetailsHeading">Citizen Details</h3>
+                  <p class="text-[11px] text-slate-500" data-i18n="citizenDetailsSub">Used for official SMS/Email resolution alerts &amp; ward verification</p>
+                </div>
+              </div>
+              <span id="citizenVerifiedBadge" class="hidden px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                <i class="fa-solid fa-circle-check mr-1"></i>Verified Citizen
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1" data-i18n="citizenFullNameLabel">Full Name *</label>
+                <input type="text" id="citizenNameInput" required placeholder="e.g., Karthik Subramanian" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1" data-i18n="citizenContactLabel">Mobile Number / Email *</label>
+                <input type="text" id="citizenContactInput" required placeholder="+91 98422 11045" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-700 mb-1" data-i18n="citizenWardLabel">Residential Ward / Locality *</label>
+                <input type="text" id="citizenWardInput" required placeholder="e.g., Ward 24, RS Puram" class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Issue Title *</label>
+              <input type="text" id="issueTitleInput" required oninput="scheduleGeminiTriage()" placeholder="e.g., Deep pothole blocking main bus lane" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Civic Category (Auto-Detected by AI) *</label>
+              <select id="issueCategoryInput" onchange="handleManualCategoryChange()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500">
+                <option value="Roads & Potholes">Roads &amp; Potholes</option>
+                <option value="Water & Drainage">Water &amp; Drainage</option>
+                <option value="Garbage & Sanitation">Garbage &amp; Sanitation</option>
+                <option value="Streetlights & Electricity">Streetlights &amp; Electricity</option>
+                <option value="Public Safety & Traffic">Public Safety &amp; Traffic</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Detailed Description &amp; Public Impact *</label>
+            <textarea id="issueDescInput" rows="3" required oninput="scheduleGeminiTriage()" placeholder="Describe the severity, nearby schools/hospitals, and safety risks to commuters or residents..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+            <div class="sm:col-span-8">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Location / Street Landmark *</label>
+              <div class="relative">
+                <i class="fa-solid fa-location-dot absolute left-3.5 top-1/2 -translate-y-1/2 text-rose-500"></i>
+                <input type="text" id="issueLocationInput" required oninput="scheduleGeminiTriage()" placeholder="e.g., 100 Feet Road, Gandhipuram, Coimbatore" class="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+              </div>
+            </div>
+            <div class="sm:col-span-4">
+              <button type="button" onclick="autoDetectLocation()" class="w-full py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-crosshairs text-emerald-400"></i>
+                <span>Pin Live GPS</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Optional Image Evidence Upload -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Optional Image Evidence</label>
+            <div class="border-2 border-dashed border-slate-300 rounded-2xl p-4 bg-slate-50/70 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl shrink-0">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-semibold text-slate-800">Upload site photo (optional) or pick a sample civic hazard photo</p>
+                  <p class="text-[11px] text-slate-500">Supports JPG/PNG • EXIF GPS &amp; timestamp watermarked automatically</p>
+                </div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <label class="cursor-pointer px-3 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-xs font-semibold text-slate-700 shadow-sm transition">
+                  <i class="fa-solid fa-image mr-1"></i> Browse Photo
+                  <input type="file" accept="image/*" onchange="handlePhotoUpload(event)" class="hidden" />
+                </label>
+                <button type="button" onclick="selectSamplePhoto('pothole')" class="px-2.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-semibold">Sample Pothole</button>
+                <button type="button" onclick="selectSamplePhoto('garbage')" class="px-2.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold">Sample Waste</button>
+              </div>
+            </div>
+            <div id="photoPreviewStatus" class="hidden mt-2 flex items-center gap-2 text-xs text-emerald-700 font-medium bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Geo-tagged evidence attached and ready for submission.</span>
+            </div>
+          </div>
+
+          <!-- GOOGLE GEMINI AI CLASSIFICATION, PRIORITY & DEPARTMENT ENGINE -->
+          <div class="rounded-2xl bg-gradient-to-r from-blue-50 via-indigo-50 to-slate-50 border border-indigo-200 p-4 space-y-3 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center text-xs">
+                  <i class="fa-solid fa-sparkles"></i>
+                </span>
+                <div>
+                  <span class="text-xs font-extrabold text-indigo-950 block">Google Gemini AI Civic Analyzer</span>
+                  <span id="geminiEngineStatus" class="text-[10px] font-semibold text-indigo-600">Type issue details or click Analyze to classify category, priority &amp; department</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="aiSeverityPill" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">Priority: High</span>
+                <button type="button" id="runGeminiBtn" onclick="runGeminiAiAnalysis(true)" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold shadow-sm transition flex items-center gap-1.5">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                  <span>Analyze with Gemini</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+              <div class="bg-white/90 rounded-xl p-2.5 border border-indigo-100">
+                <span class="text-slate-400 block text-[10px] uppercase font-bold">1. AI Identified Category</span>
+                <span id="aiCategoryOutput" class="font-extrabold text-slate-900">Roads &amp; Potholes</span>
+              </div>
+              <div class="bg-white/90 rounded-xl p-2.5 border border-indigo-100">
+                <span class="text-slate-400 block text-[10px] uppercase font-bold">2. Priority Detection</span>
+                <span id="aiPriorityOutput" class="font-extrabold text-amber-700">High Priority (24h–48h SLA)</span>
+              </div>
+              <div class="bg-white/90 rounded-xl p-2.5 border border-indigo-100">
+                <span class="text-slate-400 block text-[10px] uppercase font-bold">3. Recommended Department</span>
+                <span id="aiDeptOutput" class="font-extrabold text-blue-800">Roads &amp; Highways Dept</span>
+              </div>
+            </div>
+
+            <div class="bg-white/80 rounded-xl px-3 py-2 border border-indigo-100 text-[11px] text-slate-700 flex items-start gap-2">
+              <i class="fa-solid fa-circle-info text-indigo-600 mt-0.5"></i>
+              <span id="aiReasoningOutput">AI Triage Note: Enter your complaint title and description so Gemini can assess public safety impact and route it to the exact municipal wing.</span>
+            </div>
+          </div>
+
+          <div class="pt-2 flex items-center justify-end gap-3">
+            <button type="button" onclick="navigateToPage('map')" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold">Cancel</button>
+            <button type="submit" id="submitComplaintBtn" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-md shadow-blue-600/20 transition flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i>
+              <span>Submit Official Complaint</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PAGE 4: ISSUE TRACKING DASHBOARD (REPORTED / IN PROGRESS / RESOLVED) -->
+    <!-- =================================================================== -->
+    <section id="pageMyIssues" class="hidden page-transition space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="font-bold text-lg text-slate-900">Issue Tracking Dashboard</h2>
+            <p class="text-xs text-slate-500">Track submitted complaints across Reported, In Progress, and Resolved statuses, see days existing, and download receipts</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="trackingStatusFilter" onchange="renderMyAppliedComplaints()" class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-700">
+              <option value="ALL">All Statuses</option>
+              <option value="Reported">Reported</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+            <button onclick="navigateToPage('report')" class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-plus"></i>
+              <span>Report New Issue</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-slate-50 p-3.5 rounded-xl border border-slate-200/80">
+          <div class="sm:col-span-8 relative">
+            <i class="fa-solid fa-id-card text-indigo-600 absolute left-3.5 top-1/2 -translate-y-1/2 text-xs"></i>
+            <input type="text" id="myIssuesLookupInput" oninput="renderMyAppliedComplaints()" placeholder="Filter by Mobile Number, Email, or Name (leave blank to view all city complaints)..." class="w-full pl-9 pr-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500" />
+          </div>
+          <div class="sm:col-span-4 flex items-center justify-end gap-2">
+            <button type="button" onclick="document.getElementById('myIssuesLookupInput').value=''; document.getElementById('trackingStatusFilter').value='ALL'; renderMyAppliedComplaints();" class="px-3 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold">
+              Show All
+            </button>
+            <button type="button" onclick="openLoginModal('citizen')" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-mobile-screen-button text-emerald-400"></i>
+              <span>Citizen OTP Sync</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-100">
+            <div class="text-[11px] font-semibold text-indigo-700">Total Tracked</div>
+            <div id="myStatTotal" class="text-xl font-extrabold text-indigo-950 mt-0.5">0</div>
+          </div>
+          <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-100">
+            <div class="text-[11px] font-semibold text-amber-700">Reported</div>
+            <div id="myStatOpen" class="text-xl font-extrabold text-amber-950 mt-0.5">0</div>
+          </div>
+          <div class="p-3 rounded-xl bg-blue-50/70 border border-blue-100">
+            <div class="text-[11px] font-semibold text-blue-700">In Progress</div>
+            <div id="myStatInProgress" class="text-xl font-extrabold text-blue-950 mt-0.5">0</div>
+          </div>
+          <div class="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100">
+            <div class="text-[11px] font-semibold text-emerald-700">Resolved</div>
+            <div id="myStatResolved" class="text-xl font-extrabold text-emerald-950 mt-0.5">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="myAppliedComplaintsList" class="space-y-4"></div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PAGE 5: PUBLIC FEED & WARD GUARDIAN LEADERBOARD PAGE                -->
+    <!-- =================================================================== -->
+    <section id="pageFeed" class="hidden page-transition grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-8 space-y-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-col sm:flex-row gap-3">
+          <div class="relative flex-1">
+            <i class="fa-solid fa-magnifying-glass text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-xs"></i>
+            <input type="text" id="feedSearchInput" oninput="renderCitizenFeed()" placeholder="Search by street, ward, ticket ID (e.g. CR-2026-104)..." class="w-full pl-9 pr-3.5 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+          </div>
+          <select id="feedCategoryFilter" onchange="renderCitizenFeed()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none">
+            <option value="ALL">All Categories</option>
+            <option value="Roads & Potholes">Roads &amp; Potholes</option>
+            <option value="Water & Drainage">Water &amp; Drainage</option>
+            <option value="Garbage & Sanitation">Garbage &amp; Sanitation</option>
+            <option value="Streetlights & Electricity">Streetlights &amp; Electricity</option>
+            <option value="Public Safety & Traffic">Public Safety &amp; Traffic</option>
+          </select>
+          <select id="feedStatusFilter" onchange="renderCitizenFeed()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-medium bg-white focus:outline-none">
+            <option value="ALL">All Statuses</option>
+            <option value="Reported">Reported</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+
+        <div id="citizenIssuesList" class="space-y-4"></div>
+      </div>
+
+      <aside class="lg:col-span-4 space-y-5">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <div>
+                <h3 class="font-bold text-sm text-slate-900">Ward Guardians</h3>
+                <p class="text-[11px] text-slate-500">Top Civic Contributors</p>
+              </div>
+            </div>
+            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">This Month</span>
+          </div>
+          <div id="leaderboardList" class="space-y-3"></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- PAGE 6: ADMIN DASHBOARD (INDIVIDUAL OFFICER SIGN-IN + WORKBENCH)    -->
+    <!-- =================================================================== -->
+    <section id="pageAuthority" class="hidden page-transition space-y-6">
+
+      <!-- SUB-VIEW 6A: INDIVIDUAL AUTHORITY OFFICER DETAILS ENTRY -->
+      <div id="authorityOnboardingPage" class="max-w-3xl mx-auto bg-white rounded-3xl border border-slate-200 shadow-lg overflow-hidden">
+        <div class="bg-slate-900 text-white p-6 sm:p-8 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center text-xl">
+              <i class="fa-solid fa-id-card-clip"></i>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">Municipal Administrator Verification</span>
+              <h2 class="text-xl sm:text-2xl font-extrabold mt-1">Admin Officer Sign-In &amp; Individual Details</h2>
+              <p class="text-xs text-slate-300 mt-0.5">Enter your individual official credentials to review complaints, update statuses, and manage reported issues.</p>
+            </div>
+          </div>
+          <button type="button" onclick="fillDemoOfficerProfile()" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-amber-300 border border-white/15 text-xs font-bold transition">
+            <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Fill Sample Admin
+          </button>
+        </div>
+
+        <form id="authorityOfficerForm" onsubmit="saveAuthorityOfficerProfile(event)" class="p-6 sm:p-8 space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Officer Full Name *</label>
+              <input type="text" id="authOfficerNameInput" required placeholder="e.g., Er. R. Karthikeyan" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Official Designation / Rank *</label>
+              <input type="text" id="authOfficerDesignationInput" required placeholder="e.g., Assistant Executive Engineer (AEE)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Employee / Government ID *</label>
+              <input type="text" id="authOfficerEmpIdInput" required placeholder="e.g., TN-CCMC-4082" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Assigned Department *</label>
+              <select id="authOfficerDeptInput" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600">
+                <option value="ALL">Zonal Commissioner (All Departments)</option>
+                <option value="Roads & Highways Dept">Roads &amp; Highways Dept</option>
+                <option value="Water Supply & Drainage Board">Water Supply &amp; Drainage Board</option>
+                <option value="Solid Waste Management">Solid Waste Management</option>
+                <option value="TANGEDCO / Street Lighting">TANGEDCO / Street Lighting</option>
+                <option value="Traffic & Public Safety">Traffic &amp; Public Safety</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Assigned Zone / Ward Jurisdiction *</label>
+              <input type="text" id="authOfficerZoneInput" required placeholder="e.g., Central Zone (Wards 20–40)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Official Gov Email / Direct Phone *</label>
+              <input type="text" id="authOfficerContactInput" required placeholder="e.g., karthikeyan.aee@tn.gov.in" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600" />
+            </div>
+          </div>
+
+          <div class="pt-2 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100">
+            <span class="text-[11px] text-slate-500"><i class="fa-solid fa-lock text-emerald-600 mr-1"></i> Your name, rank &amp; Employee ID will be stamped onto every ticket status update.</span>
+            <button type="submit" class="px-6 py-3 rounded-xl bg-slate-900 hover:bg-blue-700 text-white text-sm font-bold shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-shield-check text-amber-400"></i>
+              <span>Enter Admin Dashboard →</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- SUB-VIEW 6B: SIGNED-IN ADMIN COMMAND CENTER -->
+      <div id="authorityWorkspace" class="hidden space-y-6">
+        <!-- SLA Overdue Watchdog Banner -->
+        <div id="slaWatchdogBanner" class="rounded-2xl bg-gradient-to-r from-rose-600 via-rose-700 to-amber-700 text-white px-5 py-3.5 shadow-md flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <span class="w-9 h-9 rounded-xl bg-white/15 flex items-center justify-center text-base shrink-0">
+              <i class="fa-solid fa-bell-concierge animate-bounce"></i>
+            </span>
+            <div>
+              <div class="text-xs sm:text-sm font-extrabold" id="slaWatchdogHeadline">Priority Watchdog Alert: 2 Critical/High Priority Complaints Require Action</div>
+              <p class="text-[11px] text-rose-100">Review Gemini AI priority recommendations, update status (Reported → In Progress → Resolved), and archive photo proof.</p>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="simulateDayAging()" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/20 text-xs font-bold transition">
+              <i class="fa-solid fa-forward-fast mr-1"></i> +48h SLA Test
+            </button>
+            <button type="button" onclick="openDailyWardSummaryModal()" class="px-3.5 py-1.5 rounded-xl bg-white text-rose-900 hover:bg-amber-50 text-xs font-extrabold shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-print"></i>
+              <span>Daily Ward Audit Report</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Officer Identity Header Bar -->
+        <div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 font-extrabold flex items-center justify-center text-lg shadow">
+              <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <h2 id="activeOfficerNameDisplay" class="font-extrabold text-base sm:text-lg text-white">Er. R. Karthikeyan</h2>
+                <span id="activeOfficerDesignationBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">Assistant Executive Engineer</span>
+                <span id="activeOfficerEmpIdBadge" class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-white/10 text-slate-200">ID: TN-CCMC-4082</span>
+              </div>
+              <p id="activeOfficerMetaDisplay" class="text-xs text-slate-300 mt-1">Central Zone (Wards 20–40) • All Municipal Departments • karthikeyan.aee@tn.gov.in</p>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+              <button type="button" id="authSubBtnQueue" onclick="switchAuthoritySubPage('queue')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-sm">Grievance Queue</button>
+              <button type="button" id="authSubBtnMap" onclick="switchAuthoritySubPage('map')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white">Ward Google Map</button>
+            </div>
+            <button type="button" onclick="editAuthorityOfficerProfile()" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/15 text-xs font-semibold transition flex items-center gap-1.5">
+              <i class="fa-solid fa-pen-to-square text-amber-300"></i>
+              <span>Switch / Edit Officer</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub-page A: Split Two-Column Unsolved vs Solved & Evidence Archive -->
+        <div id="authoritySubPageQueue" class="space-y-4">
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-base text-slate-900">Admin Grievance Management &amp; Evidence Documentation</h3>
+              <p class="text-xs text-slate-500">Review Gemini-prioritized active tickets on the left; resolved problems move into the permanent Evidence &amp; Documentation archive on the right.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <select id="adminDeptFilter" onchange="renderAdminDashboard()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50">
+                <option value="ALL">All Departments</option>
+                <option value="Roads & Highways Dept">Roads &amp; Highways Dept</option>
+                <option value="Water Supply & Drainage Board">Water Supply &amp; Drainage Board</option>
+                <option value="Solid Waste Management">Solid Waste Management</option>
+                <option value="TANGEDCO / Street Lighting">TANGEDCO / Street Lighting</option>
+                <option value="Traffic & Public Safety">Traffic &amp; Public Safety</option>
+              </select>
+              <select id="adminPriorityFilter" onchange="renderAdminDashboard()" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold bg-slate-50">
+                <option value="ALL">All Priorities</option>
+                <option value="Critical">Critical Priority</option>
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+              </select>
+              <input type="text" id="adminSearchInput" oninput="renderAdminDashboard()" placeholder="Search ticket, street, or officer..." class="px-3 py-2 rounded-xl border border-slate-200 text-xs" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <!-- LEFT COLUMN: UNSOLVED / ACTIVE PROBLEMS -->
+            <div class="bg-white rounded-2xl border border-amber-200/80 shadow-sm overflow-hidden">
+              <div class="px-5 py-4 bg-gradient-to-r from-amber-50 to-rose-50/60 border-b border-amber-200/70 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-sm shadow-sm">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                  </span>
+                  <div>
+                    <h4 class="font-extrabold text-sm text-slate-900">Active Complaints (Reported &amp; In Progress)</h4>
+                    <p class="text-[11px] text-slate-600">Sorted by AI Priority &amp; Days Existing</p>
+                  </div>
+                </div>
+                <span id="unsolvedColumnCount" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300">0 Active</span>
+              </div>
+              <div id="adminUnsolvedColumn" class="p-4 space-y-3.5 max-h-[680px] overflow-y-auto"></div>
+            </div>
+
+            <!-- RIGHT COLUMN: SOLVED PROBLEMS & EVIDENCE DOCUMENTATION -->
+            <div class="bg-white rounded-2xl border border-emerald-200/90 shadow-sm overflow-hidden">
+              <div class="px-5 py-4 bg-gradient-to-r from-emerald-50 to-teal-50/70 border-b border-emerald-200/80 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-sm shadow-sm">
+                    <i class="fa-solid fa-folder-closed"></i>
+                  </span>
+                  <div>
+                    <h4 class="font-extrabold text-sm text-slate-900">Resolved Complaints (Evidence &amp; Documentation)</h4>
+                    <p class="text-[11px] text-slate-600">Archived with Before/After photos, Officer ID &amp; audit logs</p>
+                  </div>
+                </div>
+                <span id="solvedColumnCount" class="px-2.5 py-1 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300">0 Resolved</span>
+              </div>
+              <div id="adminSolvedColumn" class="p-4 space-y-3.5 max-h-[680px] overflow-y-auto"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sub-page B: Authority Ward Geospatial Google Map -->
+        <div id="authoritySubPageMap" class="hidden bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h3 class="font-bold text-base text-slate-900">Officer Ward Geospatial Google Map</h3>
+              <p class="text-xs text-slate-500">Click any map pointer or ward ticket below to inspect field coordinates</p>
+            </div>
+          </div>
+          <div id="adminDigitalMap" class="relative w-full h-[380px] rounded-2xl overflow-hidden border border-slate-200 bg-slate-100"></div>
+          <div class="pt-3 border-t border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-location-crosshairs text-blue-600 mr-1"></i> Active Ward Tickets</span>
+              <span id="adminMapDirectoryCount" class="text-[11px] font-semibold text-slate-500">5 Active</span>
+            </div>
+            <div id="adminMapProblemsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 1: ISSUE DETAILS & BEFORE/AFTER TIMELINE MODAL                  -->
+  <!-- ===================================================================== -->
+  <div id="issueDetailModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span id="modalTicketId" class="px-2.5 py-0.5 rounded-md bg-blue-600 text-xs font-bold">CR-2026-104</span>
+          <h3 id="modalTitle" class="font-bold text-base truncate max-w-md">Issue Details</h3>
+        </div>
+        <button onclick="closeModal('issueDetailModal')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="issueDetailModalBody" class="p-6 space-y-5 max-h-[80vh] overflow-y-auto"></div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 2: ADMIN UPDATE STATUS & PROOF OF RESOLUTION MODAL              -->
+  <!-- ===================================================================== -->
+  <div id="resolveActionModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <h3 class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-clipboard-check text-emerald-400"></i>
+          <span>Update Status &amp; Upload Resolution Proof</span>
+        </h3>
+        <button onclick="closeModal('resolveActionModal')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form onsubmit="submitAuthorityResolution(event)" class="p-6 space-y-4">
+        <input type="hidden" id="resolveTicketId" />
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Update Official Status</label>
+          <select id="resolveNewStatus" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-semibold bg-white">
+            <option value="Reported">Reported (Acknowledged)</option>
+            <option value="In Progress">In Progress (Crew Dispatched)</option>
+            <option value="Resolved">Resolved (Upload After-Photo Proof)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Signing Officer Name, Rank &amp; ID</label>
+          <input type="text" id="resolveOfficerInput" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm bg-slate-50 font-semibold" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Official Field Action Remarks *</label>
+          <textarea id="resolveRemarksInput" rows="3" required placeholder="Describe field work completed, materials used, or crew dispatch ETA..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm"></textarea>
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">After-Resolution Completion Photo</label>
+          <div class="flex flex-wrap items-center gap-2">
+            <label class="cursor-pointer px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-800 border border-slate-300">
+              <i class="fa-solid fa-camera mr-1"></i> Upload After Photo
+              <input type="file" accept="image/*" onchange="handleAfterPhotoUpload(event)" class="hidden" />
+            </label>
+            <button type="button" onclick="attachVerifiedAfterPreset()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-semibold">
+              Use Verified Repair Photo
+            </button>
+          </div>
+          <p id="afterPhotoStatus" class="hidden text-xs text-emerald-700 font-semibold mt-1.5">✓ Completion proof photo attached.</p>
+        </div>
+        <div class="pt-2 flex justify-end gap-2">
+          <button type="button" onclick="closeModal('resolveActionModal')" class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm">Save &amp; Notify Citizen</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 3: SEPARATE CITIZEN LOGIN & AUTHORITY OFFICER LOGIN (WITH OTP)  -->
+  <!-- ===================================================================== -->
+  <div id="otpAuthModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden my-auto">
+      <div id="loginModalHeader" class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i id="loginModalHeaderIcon" class="fa-solid fa-user text-blue-400"></i>
+          <h3 id="loginModalHeaderTitle" class="font-bold text-base">Citizen Portal Login</h3>
+        </div>
+        <button onclick="closeModal('otpAuthModal')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200">
+          <button type="button" id="otpRoleCitizenBtn" onclick="selectOtpLoginRole('citizen')" class="py-2 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-sm flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-user"></i>
+            <span>Citizen Login</span>
+          </button>
+          <button type="button" id="otpRoleAdminBtn" onclick="selectOtpLoginRole('admin')" class="py-2 rounded-lg text-xs font-bold text-slate-600 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Admin Login</span>
+          </button>
+        </div>
+
+        <!-- CITIZEN LOGIN VIEW (2-STEP OTP) -->
+        <div id="citizenLoginSection" class="space-y-4">
+          <div id="citizenOtpStep1" class="space-y-3">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Citizen Full Name *</label>
+              <input type="text" id="citizenLoginNameInput" value="Karthik Subramanian" placeholder="Enter your full name" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Mobile Number or Email *</label>
+              <input type="text" id="otpIdentifierInput" value="+91 98422 11045" placeholder="+91 98422 11045 or citizen@email.com" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Home Ward / Locality</label>
+              <input type="text" id="citizenLoginWardInput" value="Ward 24, RS Puram" placeholder="e.g., Ward 24, RS Puram" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium" />
+            </div>
+            <button type="button" onclick="sendOtpCode()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-sm transition">
+              Send Citizen Verification OTP
+            </button>
+          </div>
+
+          <div id="citizenOtpStep2" class="hidden space-y-3">
+            <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 flex items-center justify-between">
+              <span>Citizen OTP sent: <strong class="font-mono text-sm">482910</strong></span>
+              <button type="button" onclick="autoFillOtp()" class="underline font-bold text-emerald-900">Auto-Fill Code</button>
+            </div>
+            <div class="grid grid-cols-6 gap-2">
+              <input type="text" maxlength="1" class="otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-blue-600 focus:outline-none" />
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="backToCitizenStep1()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">
+                ← Back
+              </button>
+              <button type="button" onclick="verifyCitizenOtpCode()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-sm transition">
+                Verify &amp; Enter Citizen Portal
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- AUTHORITY INDIVIDUAL OFFICER LOGIN VIEW (2-STEP GOV OTP) -->
+        <div id="authorityLoginSection" class="hidden space-y-3.5">
+          <form id="authorityOtpStep1" onsubmit="sendAuthorityOtpCode(event)" class="space-y-3.5">
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
+              <span><i class="fa-solid fa-id-badge mr-1 text-amber-600"></i> Enter your individual Municipal Admin credentials:</span>
+              <button type="button" onclick="fillDemoAuthorityLoginModal()" class="underline font-bold text-amber-950 shrink-0">Demo Admin</button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">Officer Full Name *</label>
+                <input type="text" id="modalAuthNameInput" required placeholder="e.g., Er. R. Karthikeyan" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">Designation / Rank *</label>
+                <input type="text" id="modalAuthDesignationInput" required placeholder="e.g., Asst. Executive Engineer" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">Employee / Gov ID *</label>
+                <input type="text" id="modalAuthEmpIdInput" required placeholder="e.g., TN-CCMC-4082" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">Department *</label>
+                <select id="modalAuthDeptInput" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium bg-white">
+                  <option value="ALL">Zonal Commissioner (All Depts)</option>
+                  <option value="Roads & Highways Dept">Roads &amp; Highways Dept</option>
+                  <option value="Water Supply & Drainage Board">Water Supply &amp; Drainage Board</option>
+                  <option value="Solid Waste Management">Solid Waste Management</option>
+                  <option value="TANGEDCO / Street Lighting">TANGEDCO / Street Lighting</option>
+                  <option value="Traffic & Public Safety">Traffic &amp; Public Safety</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">Assigned Zone / Ward *</label>
+                <input type="text" id="modalAuthZoneInput" required placeholder="e.g., Central Zone (Wards 20-40)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">Official Gov Email / Phone *</label>
+                <input type="text" id="modalAuthContactInput" required placeholder="e.g., karthikeyan.aee@tn.gov.in" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-medium" />
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-blue-700 text-white text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-key text-amber-400"></i>
+              <span>Send Official Gov Verification OTP</span>
+            </button>
+          </form>
+
+          <div id="authorityOtpStep2" class="hidden space-y-3.5">
+            <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 space-y-1">
+              <div class="flex items-center justify-between">
+                <span><i class="fa-solid fa-shield-halved text-amber-600 mr-1"></i> Gov OTP sent to <strong id="authOtpTargetDisplay">officer@tn.gov.in</strong></span>
+                <button type="button" onclick="autoFillAuthorityOtp()" class="underline font-bold text-amber-900">Auto-Fill Code</button>
+              </div>
+              <div>Demo Official Security Code: <strong class="font-mono text-sm tracking-wider bg-white px-2 py-0.5 rounded border border-amber-300">739154</strong></div>
+            </div>
+
+            <div class="grid grid-cols-6 gap-2">
+              <input type="text" maxlength="1" class="auth-otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-amber-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="auth-otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-amber-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="auth-otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-amber-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="auth-otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-amber-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="auth-otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-amber-600 focus:outline-none" />
+              <input type="text" maxlength="1" class="auth-otp-digit w-full h-11 text-center font-bold text-lg border border-slate-300 rounded-xl focus:border-amber-600 focus:outline-none" />
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="backToAuthorityStep1()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50">
+                ← Edit Details
+              </button>
+              <button type="button" onclick="verifyAuthorityOtpCode()" class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold shadow-md transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-shield-check"></i>
+                <span>Verify Gov OTP &amp; Enter Admin Dashboard</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL 4: OFFICIAL PRINTABLE RECEIPT & WARD AUDIT REPORT MODAL         -->
+  <!-- ===================================================================== -->
+  <div id="officialDocumentModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <h3 id="officialDocModalTitle" class="font-bold text-base flex items-center gap-2">
+          <i class="fa-solid fa-file-invoice text-amber-400"></i>
+          <span>Official Municipal Acknowledgement Receipt</span>
+        </h3>
+        <button onclick="closeModal('officialDocumentModal')" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-200">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="printableReceiptArea" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto text-xs text-slate-800"></div>
+      <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-end gap-2">
+        <button type="button" onclick="copyOfficialDocumentText()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-copy"></i>
+          <span>Copy Text</span>
+        </button>
+        <button type="button" onclick="window.print()" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-print"></i>
+          <span>Print / Save PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FLOATING INTERACTIVE CIVICRESOLVE APP GUIDE ASSISTANT                 -->
+  <!-- ===================================================================== -->
+  <div id="appGuideWidget" class="fixed bottom-5 left-5 z-40 flex flex-col items-start">
+    <div id="appGuidePanel" class="hidden mb-3 w-[340px] sm:w-[380px] max-w-[calc(100vw-2.5rem)] bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col">
+      <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white px-4 py-3.5 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-blue-500/25 border border-blue-400/40 text-amber-300 flex items-center justify-center text-base">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5">
+              <h3 class="text-xs sm:text-sm font-extrabold">CivicResolve App Guide</h3>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            </div>
+            <p class="text-[11px] text-blue-200">Interactive Walkthrough &amp; Smart Help</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1">
+          <button type="button" onclick="readCurrentGuideAloud()" title="Read Guide Aloud" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 flex items-center justify-center text-xs transition">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+          <button type="button" onclick="toggleAppGuide(false)" title="Minimize Guide" class="w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 flex items-center justify-center text-xs transition">
+            <i class="fa-solid fa-chevron-down"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="guideTourBanner" class="bg-blue-50 border-b border-blue-100 px-4 py-2.5 flex items-center justify-between gap-2">
+        <div class="text-[11px] font-bold text-blue-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-compass text-blue-600"></i>
+          <span id="guideTourStepLabel">New here? Take the 5-step workflow tour!</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
+          <button type="button" id="guidePrevBtn" onclick="prevGuideStep()" class="hidden px-2 py-1 rounded-lg bg-white border border-blue-200 text-blue-700 text-[11px] font-bold hover:bg-blue-100 transition">←</button>
+          <button type="button" id="guideNextBtn" onclick="nextGuideStep()" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-sm transition">Start Tour →</button>
+        </div>
+      </div>
+
+      <div id="appGuideMessages" class="p-3.5 space-y-2.5 max-h-60 overflow-y-auto bg-slate-50/70 text-xs"></div>
+
+      <div class="px-3.5 py-2 bg-white border-t border-slate-100 flex flex-wrap gap-1.5">
+        <button type="button" onclick="handleGuideQuickAction('report')" class="px-2.5 py-1 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-[11px] border border-blue-200 transition">📝 Gemini Report</button>
+        <button type="button" onclick="handleGuideQuickAction('voice')" class="px-2.5 py-1 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-800 font-semibold text-[11px] border border-amber-200 transition">🎙️ Voice Assistant</button>
+        <button type="button" onclick="handleGuideQuickAction('track')" class="px-2.5 py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-[11px] border border-indigo-200 transition">🔍 Issue Tracking</button>
+        <button type="button" onclick="handleGuideQuickAction('map')" class="px-2.5 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-[11px] border border-emerald-200 transition">🗺️ Google Map</button>
+        <button type="button" onclick="handleGuideQuickAction('authority')" class="px-2.5 py-1 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold text-[11px] border border-rose-200 transition">🛡️ Admin Dashboard</button>
+      </div>
+
+      <form onsubmit="submitAppGuideQuestion(event)" class="p-2.5 bg-white border-t border-slate-200 flex items-center gap-2">
+        <input type="text" id="appGuideInput" placeholder="Ask how to use any page..." class="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500" />
+        <button type="submit" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+
+    <button type="button" id="appGuideLauncherBtn" onclick="toggleAppGuide()" class="group flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-slate-900 hover:bg-blue-700 text-white shadow-xl border border-slate-700/80 transition-all">
+      <span class="relative flex h-3 w-3">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-400"></span>
+      </span>
+      <i class="fa-solid fa-compass text-amber-300 text-sm"></i>
+      <span class="text-xs font-extrabold tracking-wide">Need Help? App Guide</span>
+    </button>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT APPLICATION LOGIC                                          -->
+  <!-- ===================================================================== -->
+  <script>
+    // -----------------------------------------------------------------------
+    // 1. MULTI-LANGUAGE DICTIONARY (ENGLISH, TAMIL, HINDI)
+    // -----------------------------------------------------------------------
+    const I18N = {
+      en: {
+        tagline: "Transparent Citizen-to-Government Issue Resolution",
+        authorityDashboard: "Admin Dashboard",
+        heroTitle: "Spot a Civic Issue? Report It in 30 Seconds.",
+        heroSubtitle: "Submit your civic complaint with title, description, location, category, and optional image. Google Gemini automatically classifies the category, detects priority urgency, and routes it to the right municipal department.",
+        voiceQuickStart: "Report by Voice Assistant",
+        publicFeed: "Public Feed",
+        reportIssue: "Report Issue",
+        myAppliedComplaints: "Issue Tracking",
+        liveMap: "Google Map",
+        voiceAssistantTitle: "AI Voice Complaint Assistant",
+        citizenDetailsHeading: "Citizen Details",
+        citizenDetailsSub: "Used for official SMS/Email resolution alerts & ward verification",
+        citizenFullNameLabel: "Full Name *",
+        citizenContactLabel: "Mobile Number / Email *",
+        citizenWardLabel: "Residential Ward / Locality *"
+      },
+      ta: {
+        tagline: "வெளிப்படையான குடிமக்கள்-அரசு புகார் தீர்வு தளம்",
+        authorityDashboard: "நிர்வாக தளம்",
+        heroTitle: "பொதுப் பிரச்சனையைக் கண்டீர்களா? 30 வினாடிகளில் புகாரளியுங்கள்.",
+        heroSubtitle: "தலைப்பு, விளக்கம், இடம் மற்றும் புகைப்படத்துடன் புகாரளியுங்கள். Google Gemini AI தானாகவே வகை, முன்னுரிமை மற்றும் துறையைத் தீர்மானிக்கும்.",
+        voiceQuickStart: "குரல் உதவியாளர் மூலம் புகார்",
+        publicFeed: "பொதுப் புகார்கள்",
+        reportIssue: "புதிய புகார்",
+        myAppliedComplaints: "புகார் கண்காணிப்பு",
+        liveMap: "கூகுள் வரைபடம்",
+        voiceAssistantTitle: "AI குரல் புகார் உதவியாளர்",
+        citizenDetailsHeading: "குடிமகன் விவரங்கள்",
+        citizenDetailsSub: "SMS/மின்னஞ்சல் அறிவிப்புகள் மற்றும் வார்டு சரிபார்ப்புக்காக",
+        citizenFullNameLabel: "முழுப் பெயர் *",
+        citizenContactLabel: "கைபேசி எண் / மின்னஞ்சல் *",
+        citizenWardLabel: "வார்டு / பகுதி *"
+      },
+      hi: {
+        tagline: "पारदर्शी नागरिक-से-सरकार समस्या समाधान मंच",
+        authorityDashboard: "एडमिन डैशबोर्ड",
+        heroTitle: "नागरिक समस्या दिखी? 30 सेकंड में रिपोर्ट करें।",
+        heroSubtitle: "शीर्षक, विवरण, स्थान और फोटो के साथ शिकायत दर्ज करें। Google Gemini AI स्वचालित रूप से श्रेणी, प्राथमिकता और विभाग की सिफारिश करता है।",
+        voiceQuickStart: "वॉयस असिस्टेंट से शिकायत करें",
+        publicFeed: "सार्वजनिक फ़ीड",
+        reportIssue: "नई शिकायत",
+        myAppliedComplaints: "शिकायत ट्रैकिंग",
+        liveMap: "गूगल मैप",
+        voiceAssistantTitle: "AI वॉयस शिकायत सहायक",
+        citizenDetailsHeading: "नागरिक विवरण",
+        citizenDetailsSub: "आधिकारिक SMS/ईमेल अपडेट और वार्ड सत्यापन के लिए",
+        citizenFullNameLabel: "पूरा नाम *",
+        citizenContactLabel: "मोबाइल नंबर / ईमेल *",
+        citizenWardLabel: "आवासीय वार्ड / क्षेत्र *"
+      }
+    };
+
+    function changeLanguage(lang) {
+      const dict = I18N[lang] || I18N.en;
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (dict[key]) el.textContent = dict[key];
+      });
+      showToast(`Language switched to ${lang.toUpperCase()}`, 'info');
+    }
+
+    // -----------------------------------------------------------------------
+    // 2. CIVIC VISUAL SVG GENERATOR & INITIAL DATA
+    // -----------------------------------------------------------------------
+    function makeCivicSvg(bg1, bg2, icon, label) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+        <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="${bg1}"/><stop offset="100%" stop-color="${bg2}"/></linearGradient></defs>
+        <rect width="640" height="360" fill="url(#g)"/>
+        <circle cx="520" cy="70" r="95" fill="rgba(255,255,255,0.08)"/>
+        <circle cx="110" cy="300" r="120" fill="rgba(255,255,255,0.06)"/>
+        <text x="50%" y="46%" dominant-baseline="middle" text-anchor="middle" font-size="68">${icon}</text>
+        <text x="50%" y="68%" dominant-baseline="middle" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-weight="700" font-size="22">${label}</text>
+      </svg>`;
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    const SAMPLE_PHOTOS = {
+      pothole: makeCivicSvg('#334155', '#0f172a', '🛣️', 'Geo-Tagged Road Pothole Evidence'),
+      garbage: makeCivicSvg('#78350f', '#451a03', '🗑️', 'Geo-Tagged Solid Waste Overflow'),
+      water: makeCivicSvg('#0369a1', '#0c4a6e', '💧', 'Geo-Tagged Pipeline & Drain Hazard'),
+      safety: makeCivicSvg('#991b1b', '#450a0a', '🚦', 'Geo-Tagged Traffic & Public Safety Hazard'),
+      resolved: makeCivicSvg('#047857', '#064e3b', '✅', 'Verified Field Crew Completion Proof')
+    };
+
+    const CATEGORY_TO_DEPT = {
+      'Roads & Potholes': 'Roads & Highways Dept',
+      'Water & Drainage': 'Water Supply & Drainage Board',
+      'Garbage & Sanitation': 'Solid Waste Management',
+      'Streetlights & Electricity': 'TANGEDCO / Street Lighting',
+      'Public Safety & Traffic': 'Traffic & Public Safety'
+    };
+
+    let state = {
+      activePage: 'map',
+      authoritySubPage: 'queue',
+      authorityOfficer: null,
+      citizenPoints: 140,
+      loggedInUser: null,
+      otpSelectedRole: 'citizen',
+      selectedMapIssueId: null,
+      lastResolvedIssueId: null,
+      mapType: 'm',
+      uploadedBeforePhoto: null,
+      uploadedAfterPhoto: null,
+      manualCategoryLocked: false,
+      currentAiTriage: {
+        category: 'Roads & Potholes',
+        priority: 'High',
+        department: 'Roads & Highways Dept',
+        reasoning: 'Standard municipal SLA routing applied.'
+      },
+      upvotedIds: new Set(['CR-2026-104']),
+      issues: [
+        {
+          id: 'CR-2026-104',
+          title: 'Deep crater pothole outside Gandhipuram Town Bus Stand',
+          category: 'Roads & Potholes',
+          department: 'Roads & Highways Dept',
+          description: 'A 4-foot wide waterlogged pothole near the central bus exit has caused two two-wheeler skids this morning. Needs urgent cold-mix bitumen patching.',
+          location: 'Cross Cut Road, Gandhipuram, Coimbatore',
+          mapX: 48,
+          mapY: 42,
+          status: 'In Progress',
+          severity: 'Critical',
+          aiReasoning: 'High commuter footfall outside central bus terminus with active two-wheeler accident risk.',
+          upvotes: 64,
+          hoursElapsed: 76,
+          citizenName: 'Karthik Subramanian',
+          citizenContact: '+91 98422 11045',
+          citizenWard: 'Ward 24, Gandhipuram',
+          officer: 'Er. M. Senthil Kumar (AE, Roads)',
+          beforePhoto: SAMPLE_PHOTOS.pothole,
+          afterPhoto: null,
+          timeline: [
+            { time: '3 days ago (76h)', text: 'Reported by Karthik Subramanian with GPS photo evidence.' },
+            { time: '3 days ago (71h)', text: 'Gemini AI classified Critical Priority & routed to Roads & Highways Dept.' },
+            { time: '6 hrs ago', text: 'Marked In Progress — Cold-mix bitumen crew assigned to Cross Cut Road.' }
+          ]
+        },
+        {
+          id: 'CR-2026-107',
+          title: 'Main drinking water pipeline burst flooding DB Road',
+          category: 'Water & Drainage',
+          department: 'Water Supply & Drainage Board',
+          description: 'High-pressure underground distribution valve leaking clean water continuously onto DB Road junction in RS Puram.',
+          location: 'DB Road, RS Puram, Coimbatore',
+          mapX: 30,
+          mapY: 56,
+          status: 'In Progress',
+          severity: 'High',
+          aiReasoning: 'Active potable water loss and road surface flooding requiring valve isolation crew.',
+          upvotes: 41,
+          hoursElapsed: 32,
+          citizenName: 'Priya Dharshini',
+          citizenContact: '+91 98422 11045',
+          citizenWard: 'Ward 22, RS Puram',
+          officer: 'Er. S. Nandini (TWAD Field Engineer)',
+          beforePhoto: SAMPLE_PHOTOS.water,
+          afterPhoto: null,
+          timeline: [
+            { time: '1 day ago (32h)', text: 'Reported and routed to Water Supply & Drainage Board.' },
+            { time: '9 hrs ago', text: 'In Progress — Valve isolation crew & excavation team dispatched on site.' }
+          ]
+        },
+        {
+          id: 'CR-2026-109',
+          title: 'Uncollected garbage dump & overflowing bin near Peelamedu',
+          category: 'Garbage & Sanitation',
+          department: 'Solid Waste Management',
+          description: 'Three compactor bins overflowing onto the pedestrian footpath near PSG Tech bus stop, attracting stray cattle.',
+          location: 'Avinashi Road, Peelamedu, Coimbatore',
+          mapX: 74,
+          mapY: 34,
+          status: 'Reported',
+          severity: 'High',
+          aiReasoning: 'Sanitation bottleneck near educational institution and arterial transit stop.',
+          upvotes: 38,
+          hoursElapsed: 54,
+          citizenName: 'Aravind Swaminathan',
+          citizenContact: 'aravind.civic@gmail.com',
+          citizenWard: 'Ward 36, Peelamedu',
+          officer: 'V. Murugan (Sanitary Inspector)',
+          beforePhoto: SAMPLE_PHOTOS.garbage,
+          afterPhoto: null,
+          timeline: [
+            { time: '2 days ago (54h)', text: 'Reported via Citizen Portal and classified for Solid Waste Management.' }
+          ]
+        },
+        {
+          id: 'CR-2026-112',
+          title: '6 consecutive LED streetlights blacked out on Race Course walk',
+          category: 'Streetlights & Electricity',
+          department: 'TANGEDCO / Street Lighting',
+          description: 'Feeder pillar trip has left the southern walking track completely dark after 6:30 PM.',
+          location: 'Race Course Road, Coimbatore',
+          mapX: 55,
+          mapY: 68,
+          status: 'Reported',
+          severity: 'Medium',
+          aiReasoning: 'Evening pedestrian visibility reduced; assigned to municipal street lighting maintenance.',
+          upvotes: 19,
+          hoursElapsed: 5,
+          citizenName: 'Meenakshi Sundaram',
+          citizenContact: '+91 94431 77810',
+          citizenWard: 'Ward 68, Race Course',
+          officer: 'Awaiting Duty Lineman Assignment',
+          beforePhoto: makeCivicSvg('#1e1b4b', '#0f172a', '💡', 'Dark Streetlight Corridor Evidence'),
+          afterPhoto: null,
+          timeline: [
+            { time: '5 hrs ago', text: 'Reported and assigned to TANGEDCO / Street Lighting.' }
+          ]
+        },
+        {
+          id: 'CR-2026-101',
+          title: 'Avinashi Road Storm Drain Desilted & Grating Replaced',
+          category: 'Water & Drainage',
+          department: 'Water Supply & Drainage Board',
+          description: 'Clogged rainwater storm drain near Lakshmi Mills junction cleared before monsoon showers.',
+          location: 'Lakshmi Mills Junction, Avinashi Road, Coimbatore',
+          mapX: 64,
+          mapY: 49,
+          status: 'Resolved',
+          severity: 'High',
+          aiReasoning: 'Monsoon flood prevention along major arterial junction.',
+          upvotes: 52,
+          hoursElapsed: 28,
+          citizenName: 'Karthik Subramanian',
+          citizenContact: '+91 98422 11045',
+          citizenWard: 'Ward 24, Gandhipuram',
+          officer: 'Er. R. Karthikeyan (AEE, ID: TN-CCMC-4082)',
+          resolvedAt: '21 Nov 2026, 09:30 AM',
+          resolutionRemarks: 'JCB desilting squad cleared 2.4 tons of silt and installed heavy-duty cast-iron storm grating.',
+          beforePhoto: SAMPLE_PHOTOS.water,
+          afterPhoto: SAMPLE_PHOTOS.resolved,
+          timeline: [
+            { time: '1 day ago (28h)', text: 'Reported by Karthik Subramanian during heavy rain.' },
+            { time: '14 hrs ago', text: 'In Progress — Desilting squad & heavy crane assigned to Lakshmi Mills junction.' },
+            { time: '7 hrs ago', text: 'Resolved with Before & After photographic verification by Er. R. Karthikeyan.' }
+          ]
+        }
+      ]
+    };
+
+    // -----------------------------------------------------------------------
+    // 3. REAL GOOGLE GEMINI AI CLASSIFICATION, PRIORITY & DEPT ENGINE
+    // -----------------------------------------------------------------------
+    let geminiDebounceTimer = null;
+
+    function handleManualCategoryChange() {
+      state.manualCategoryLocked = true;
+      const selectedCat = document.getElementById('issueCategoryInput')?.value || 'Roads & Potholes';
+      const dept = CATEGORY_TO_DEPT[selectedCat] || 'Municipal Engineering Wing';
+      state.currentAiTriage.category = selectedCat;
+      state.currentAiTriage.department = dept;
+      updateTriagePreviewCard(state.currentAiTriage, 'Category manually selected');
+    }
+
+    function scheduleGeminiTriage() {
+      clearTimeout(geminiDebounceTimer);
+      geminiDebounceTimer = setTimeout(() => {
+        const title = document.getElementById('issueTitleInput')?.value.trim() || '';
+        const desc = document.getElementById('issueDescInput')?.value.trim() || '';
+        if ((title + ' ' + desc).trim().length >= 12) {
+          runGeminiAiAnalysis(false);
+        }
+      }, 750);
+    }
+
+    function deterministicCivicTriage(title, desc, location) {
+      const text = `${title} ${desc} ${location}`.toLowerCase();
+      let category = 'Roads & Potholes';
+
+      if (/(water|pipe|leak|drain|sewage|flood|gutter|manhole|tap)/.test(text)) {
+        category = 'Water & Drainage';
+      } else if (/(garbage|trash|waste|bin|dump|sanitation|smell|litter|sewer)/.test(text)) {
+        category = 'Garbage & Sanitation';
+      } else if (/(light|streetlight|lamp|pole|electric|wire|power|blackout|transformer)/.test(text)) {
+        category = 'Streetlights & Electricity';
+      } else if (/(signal|traffic|accident|zebra|crossing|encroach|safety|hazard|tree)/.test(text)) {
+        category = 'Public Safety & Traffic';
+      } else {
+        category = 'Roads & Potholes';
+      }
+
+      if (state.manualCategoryLocked) {
+        category = document.getElementById('issueCategoryInput')?.value || category;
+      }
+
+      let priority = 'Medium';
+      let reasoning = 'Routine civic maintenance issue routed to the relevant municipal wing.';
+      if (/(live wire|spark|accident|hospital|school|collapsed|burst|crater|elderly|children|emergency|highway)/.test(text)) {
+        priority = 'Critical';
+        reasoning = 'Immediate public safety hazard near high-traffic or sensitive zone; fast-track dispatch recommended.';
+      } else if (/(deep|flood|overflow|blocked|broken|dark|leak|main road|bus stand|junction)/.test(text)) {
+        priority = 'High';
+        reasoning = 'Significant disruption to daily commuters and neighborhood hygiene; 24–48h SLA priority.';
+      } else if (/(minor|small|fade|paint|cosmetic)/.test(text)) {
+        priority = 'Low';
+        reasoning = 'Low immediate public risk; scheduled for routine ward maintenance cycle.';
+      }
+
+      return {
+        category,
+        priority,
+        department: CATEGORY_TO_DEPT[category] || 'Municipal Engineering Wing',
+        reasoning
+      };
+    }
+
+    function updateTriagePreviewCard(triage, statusLabel) {
+      const catSelect = document.getElementById('issueCategoryInput');
+      if (catSelect && !state.manualCategoryLocked && CATEGORY_TO_DEPT[triage.category]) {
+        catSelect.value = triage.category;
+      }
+
+      const sevPill = document.getElementById('aiSeverityPill');
+      const catOut = document.getElementById('aiCategoryOutput');
+      const priOut = document.getElementById('aiPriorityOutput');
+      const deptOut = document.getElementById('aiDeptOutput');
+      const reasonOut = document.getElementById('aiReasoningOutput');
+      const statusEl = document.getElementById('geminiEngineStatus');
+
+      const badgeStyles = {
+        Critical: 'px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300',
+        High: 'px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300',
+        Medium: 'px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200',
+        Low: 'px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-slate-100 text-slate-700 border border-slate-300'
+      };
+
+      const priTextColors = {
+        Critical: 'font-extrabold text-rose-700',
+        High: 'font-extrabold text-amber-700',
+        Medium: 'font-extrabold text-blue-700',
+        Low: 'font-extrabold text-slate-700'
+      };
+
+      if (sevPill) {
+        sevPill.textContent = `Priority: ${triage.priority}`;
+        sevPill.className = badgeStyles[triage.priority] || badgeStyles.High;
+      }
+      if (catOut) catOut.textContent = triage.category;
+      if (priOut) {
+        priOut.textContent = `${triage.priority} Priority`;
+        priOut.className = priTextColors[triage.priority] || priTextColors.High;
+      }
+      if (deptOut) deptOut.textContent = triage.department;
+      if (reasonOut) reasonOut.textContent = `AI Reasoning: ${triage.reasoning}`;
+      if (statusEl && statusLabel) statusEl.textContent = statusLabel;
+    }
+
+    async function callGeminiWithRetry(payload, maxRetries = 3) {
+      const apiKey = "";
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+      let delay = 1000;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return await response.json();
+        } catch (err) {
+          if (attempt === maxRetries) throw err;
+          await new Promise(res => setTimeout(res, delay));
+          delay *= 2;
+        }
+      }
+    }
+
+    async function runGeminiAiAnalysis(notifyUser = false) {
+      const title = document.getElementById('issueTitleInput')?.value.trim() || '';
+      const desc = document.getElementById('issueDescInput')?.value.trim() || '';
+      const location = document.getElementById('issueLocationInput')?.value.trim() || 'Coimbatore';
+
+      if (!title && !desc) {
+        if (notifyUser) showToast('Enter a complaint title or description first for Gemini AI to analyze.', 'warning');
+        return state.currentAiTriage;
+      }
+
+      const btn = document.getElementById('runGeminiBtn');
+      const statusEl = document.getElementById('geminiEngineStatus');
+      if (btn) btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Analyzing...</span>`;
+      if (statusEl) statusEl.textContent = 'Gemini AI is evaluating category, public safety urgency & department...';
+
+      const fallbackResult = deterministicCivicTriage(title, desc, location);
+
+      try {
+        const prompt = `Analyze this citizen civic complaint and classify it accurately:
+Title: "${title}"
+Description: "${desc}"
+Location: "${location}"
+
+Choose category strictly from: ["Roads & Potholes", "Water & Drainage", "Garbage & Sanitation", "Streetlights & Electricity", "Public Safety & Traffic"].
+Choose priority strictly from: ["Critical", "High", "Medium", "Low"] based on public safety risk and urgency.
+Choose department strictly from: ["Roads & Highways Dept", "Water Supply & Drainage Board", "Solid Waste Management", "TANGEDCO / Street Lighting", "Traffic & Public Safety"].`;
+
+        const payload = {
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                category: { type: "STRING" },
+                priority: { type: "STRING" },
+                department: { type: "STRING" },
+                reasoning: { type: "STRING" }
+              },
+              required: ["category", "priority", "department", "reasoning"]
+            }
+          }
+        };
+
+        const result = await callGeminiWithRetry(payload, 2);
+        const rawText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!rawText) throw new Error('Empty Gemini response');
+
+        const parsed = JSON.parse(rawText);
+        const validCategories = Object.keys(CATEGORY_TO_DEPT);
+        const finalCategory = state.manualCategoryLocked
+          ? (document.getElementById('issueCategoryInput')?.value || fallbackResult.category)
+          : (validCategories.includes(parsed.category) ? parsed.category : fallbackResult.category);
+
+        const validPriorities = ['Critical', 'High', 'Medium', 'Low'];
+        const finalPriority = validPriorities.includes(parsed.priority) ? parsed.priority : fallbackResult.priority;
+        const finalDept = state.manualCategoryLocked
+          ? (CATEGORY_TO_DEPT[finalCategory] || fallbackResult.department)
+          : (parsed.department || CATEGORY_TO_DEPT[finalCategory] || fallbackResult.department);
+
+        state.currentAiTriage = {
+          category: finalCategory,
+          priority: finalPriority,
+          department: finalDept,
+          reasoning: parsed.reasoning || fallbackResult.reasoning
+        };
+
+        updateTriagePreviewCard(state.currentAiTriage, '✓ Classified live by Google Gemini AI');
+        if (notifyUser) {
+          showToast(`Gemini AI: ${finalCategory} • ${finalPriority} Priority → ${finalDept}`, 'success');
+        }
+      } catch (e) {
+        state.currentAiTriage = fallbackResult;
+        updateTriagePreviewCard(fallbackResult, '✓ Classified by Civic AI Triage Engine');
+        if (notifyUser) {
+          showToast(`AI Triage: ${fallbackResult.category} • ${fallbackResult.priority} Priority`, 'info');
+        }
+      } finally {
+        if (btn) btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i><span>Analyze with Gemini</span>`;
+      }
+
+      return state.currentAiTriage;
+    }
+
+    // -----------------------------------------------------------------------
+    // 4. FORM HELPERS, CITIZEN ISSUE SUBMISSION & SLA DAY SIMULATION
+    // -----------------------------------------------------------------------
+    function autoDetectLocation() {
+      const landmarks = [
+        '100 Feet Road, Gandhipuram, Coimbatore',
+        'Avinashi Road, Peelamedu, Coimbatore',
+        'DB Road, RS Puram, Coimbatore',
+        'Trichy Road, Singanallur, Coimbatore',
+        'Mettupalayam Road, Saibaba Colony, Coimbatore'
+      ];
+      const picked = landmarks[Math.floor(Math.random() * landmarks.length)];
+      const locInput = document.getElementById('issueLocationInput');
+      if (locInput) {
+        locInput.value = picked;
+        scheduleGeminiTriage();
+      }
+      showToast(`Live GPS coordinates locked: ${picked}`, 'success');
+    }
+
+    function selectSamplePhoto(type) {
+      state.uploadedBeforePhoto = SAMPLE_PHOTOS[type] || SAMPLE_PHOTOS.pothole;
+      document.getElementById('photoPreviewStatus')?.classList.remove('hidden');
+      showToast('Geo-tagged sample evidence photo attached!', 'success');
+    }
+
+    function handlePhotoUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        state.uploadedBeforePhoto = e.target.result;
+        document.getElementById('photoPreviewStatus')?.classList.remove('hidden');
+        showToast('Site photo uploaded and watermarked!', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function handleIssueSubmit(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('submitComplaintBtn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Classifying & Submitting...</span>`;
+      }
+
+      try {
+        const triage = await runGeminiAiAnalysis(false);
+        const citizenName = document.getElementById('citizenNameInput').value.trim();
+        const citizenContact = document.getElementById('citizenContactInput').value.trim();
+        const citizenWard = document.getElementById('citizenWardInput').value.trim();
+        const title = document.getElementById('issueTitleInput').value.trim();
+        const description = document.getElementById('issueDescInput').value.trim();
+        const location = document.getElementById('issueLocationInput').value.trim();
+
+        const newId = `CR-2026-${Math.floor(115 + Math.random() * 880)}`;
+        const defaultPhotoMap = {
+          'Roads & Potholes': SAMPLE_PHOTOS.pothole,
+          'Water & Drainage': SAMPLE_PHOTOS.water,
+          'Garbage & Sanitation': SAMPLE_PHOTOS.garbage,
+          'Public Safety & Traffic': SAMPLE_PHOTOS.safety,
+          'Streetlights & Electricity': makeCivicSvg('#1e1b4b', '#0f172a', '💡', 'Streetlight Hazard Evidence')
+        };
+
+        const newIssue = {
+          id: newId,
+          title,
+          category: triage.category,
+          department: triage.department,
+          description,
+          location,
+          mapX: Math.floor(25 + Math.random() * 52),
+          mapY: Math.floor(28 + Math.random() * 44),
+          status: 'Reported',
+          severity: triage.priority,
+          aiReasoning: triage.reasoning,
+          upvotes: 1,
+          hoursElapsed: 0,
+          citizenName,
+          citizenContact,
+          citizenWard,
+          officer: `Duty Engineer (${triage.department})`,
+          beforePhoto: state.uploadedBeforePhoto || defaultPhotoMap[triage.category] || SAMPLE_PHOTOS.pothole,
+          afterPhoto: null,
+          timeline: [
+            { time: 'Just now (0 days)', text: `Reported by ${citizenName} (${citizenWard}) via Citizen Portal.` },
+            { time: 'Just now (0 days)', text: `Gemini AI classified ${triage.category} (${triage.priority} Priority) & routed to ${triage.department}.` }
+          ]
+        };
+
+        state.issues.unshift(newIssue);
+        state.citizenPoints += 25;
+        state.selectedMapIssueId = newId;
+        state.uploadedBeforePhoto = null;
+        state.manualCategoryLocked = false;
+
+        document.getElementById('issueReportForm')?.reset();
+        document.getElementById('photoPreviewStatus')?.classList.add('hidden');
+        if (state.loggedInUser && state.loggedInUser.role === 'citizen') {
+          document.getElementById('citizenNameInput').value = state.loggedInUser.name || '';
+          document.getElementById('citizenContactInput').value = state.loggedInUser.identifier || '';
+          document.getElementById('citizenWardInput').value = state.loggedInUser.ward || '';
+        }
+
+        const lookupInput = document.getElementById('myIssuesLookupInput');
+        if (lookupInput) lookupInput.value = citizenContact;
+
+        updateGlobalStats();
+        navigateToPage('myissues');
+        showToast(`Complaint ${newId} submitted! +25 Impact Points earned.`, 'success');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<i class="fa-solid fa-paper-plane"></i><span>Submit Official Complaint</span>`;
+        }
+      }
+    }
+
+    function simulateDayAging() {
+      state.issues.forEach(issue => {
+        if (issue.status !== 'Resolved') {
+          issue.hoursElapsed = Number(issue.hoursElapsed || 0) + 48;
+          const totalDays = Math.floor(issue.hoursElapsed / 24);
+          issue.timeline.push({
+            time: `${totalDays} day(s) elapsed`,
+            text: `SLA Watchdog: Complaint has now existed for ${totalDays} day(s) (${issue.hoursElapsed} hrs).`
+          });
+        }
+      });
+      updateGlobalStats();
+      renderAdminDashboard();
+      renderMyAppliedComplaints();
+      renderCitizenFeed();
+      renderDigitalMap();
+      showToast('Simulated +2 Days (+48h) — "Days Existing" counters updated across all views!', 'warning');
+    }
+
+    function exportEvidenceDossier(id) {
+      const issue = state.issues.find(i => i.id === id);
+      if (!issue) return;
+      const days = Math.floor((issue.hoursElapsed || 0) / 24);
+      const record = [
+        `CIVICRESOLVE OFFICIAL EVIDENCE RECORD`,
+        `Ticket ID: ${issue.id}`,
+        `Status: ${issue.status}`,
+        `Title: ${issue.title}`,
+        `Category: ${issue.category} | Department: ${issue.department}`,
+        `Location: ${issue.location}`,
+        `Duration Existing: ${days} day(s) (${issue.hoursElapsed} hrs)`,
+        `Citizen: ${issue.citizenName} (${issue.citizenContact})`,
+        `Signing Officer: ${issue.officer}`,
+        `Resolved At: ${issue.resolvedAt || 'Verified'}`,
+        `Remarks: ${issue.resolutionRemarks || 'Completed with photographic verification.'}`
+      ].join('\n');
+
+      const ta = document.createElement('textarea');
+      ta.value = record;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast(`Official Audit Record for ${id} copied to clipboard!`, 'success');
+      } catch (e) {
+        showToast(`Evidence dossier ready for ${id}.`, 'info');
+      }
+      document.body.removeChild(ta);
+    }
+
+    // -----------------------------------------------------------------------
+    // 5. SEPARATE PAGE ROUTER & NAVIGATION CONTROLLER
+    // -----------------------------------------------------------------------
+    function navigateToPage(pageKey) {
+      state.activePage = pageKey;
+      const pageMap = {
+        home: 'pageHome',
+        map: 'pageMap',
+        report: 'pageReport',
+        myissues: 'pageMyIssues',
+        feed: 'pageFeed',
+        authority: 'pageAuthority'
+      };
+      const navMap = {
+        home: 'navPageHome',
+        map: 'navPageMap',
+        report: 'navPageReport',
+        myissues: 'navPageMyIssues',
+        feed: 'navPageFeed',
+        authority: 'navPageAuthority'
+      };
+
+      Object.keys(pageMap).forEach(key => {
+        const sectionEl = document.getElementById(pageMap[key]);
+        const navBtnEl = document.getElementById(navMap[key]);
+        if (!sectionEl || !navBtnEl) return;
+
+        if (key === pageKey) {
+          sectionEl.classList.remove('hidden');
+          navBtnEl.className = 'px-3 py-2 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-blue-700 shadow-sm';
+        } else {
+          sectionEl.classList.add('hidden');
+          navBtnEl.className = 'px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
+        }
+      });
+
+      if (pageKey === 'map') renderDigitalMap();
+      if (pageKey === 'myissues') renderMyAppliedComplaints();
+      if (pageKey === 'feed') renderCitizenFeed();
+      if (pageKey === 'authority') renderAuthorityPortalView();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function updateGlobalStats() {
+      const total = state.issues.length;
+      const highPriority = state.issues.filter(i => i.status !== 'Resolved' && (i.severity === 'Critical' || i.severity === 'High')).length;
+      const resolved = state.issues.filter(i => i.status === 'Resolved').length;
+      const rate = total ? Math.round((resolved / total) * 100) : 0;
+
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      setTxt('heroTotalIssues', total);
+      setTxt('heroResolvedRate', `${rate}%`);
+      setTxt('navEscalatedBadge', highPriority);
+      setTxt('sidebarEscalatedCount', `${highPriority} Issues`);
+      setTxt('citizenPointsDisplay', `${state.citizenPoints} pts`);
+
+      const slaBanner = document.getElementById('slaWatchdogBanner');
+      const slaHeadline = document.getElementById('slaWatchdogHeadline');
+      if (slaBanner && slaHeadline) {
+        if (highPriority > 0) {
+          slaBanner.classList.remove('hidden');
+          slaHeadline.textContent = `Priority Watchdog Alert: ${highPriority} Critical/High Priority Complaint(s) Require Action`;
+        } else {
+          slaBanner.classList.add('hidden');
+        }
+      }
+
+      const lookupVal = (document.getElementById('myIssuesLookupInput')?.value || '').trim().toLowerCase();
+      const myCount = state.issues.filter(i =>
+        !lookupVal ||
+        (i.citizenContact && i.citizenContact.toLowerCase().includes(lookupVal)) ||
+        (i.citizenName && i.citizenName.toLowerCase().includes(lookupVal))
+      ).length;
+      setTxt('myIssuesCountBadge', myCount);
+    }
+
+    function getStatusBadgeHtml(status) {
+      const styles = {
+        'Reported': 'bg-amber-100 text-amber-800 border-amber-200',
+        'In Progress': 'bg-blue-100 text-blue-800 border-blue-200',
+        'Resolved': 'bg-emerald-100 text-emerald-800 border-emerald-200'
+      };
+      const cls = styles[status] || 'bg-slate-100 text-slate-700 border-slate-200';
+      return `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${cls}">${status}</span>`;
+    }
+
+    function getPriorityBadgeHtml(priority) {
+      const styles = {
+        'Critical': 'bg-rose-100 text-rose-800 border-rose-200',
+        'High': 'bg-orange-100 text-orange-800 border-orange-200',
+        'Medium': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+        'Low': 'bg-slate-100 text-slate-700 border-slate-200'
+      };
+      const cls = styles[priority] || styles.High;
+      return `<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${cls}">${priority} Priority</span>`;
+    }
+
+    function getDaysExistingBadgeHtml(issue) {
+      const hrs = Number(issue.hoursElapsed || 0);
+      const days = Math.floor(hrs / 24);
+      const dayText = days === 0
+        ? `0 Days (Today • ${hrs}h)`
+        : days === 1
+          ? `1 Day (${hrs} hrs)`
+          : `${days} Days (${hrs} hrs)`;
+
+      const colorCls = issue.status === 'Resolved'
+        ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+        : days >= 2
+          ? 'bg-rose-50 text-rose-800 border-rose-200'
+          : 'bg-amber-50 text-amber-800 border-amber-200';
+
+      const prefix = issue.status === 'Resolved' ? 'Resolved in' : 'Existing:';
+      return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[10px] font-extrabold border ${colorCls}"><i class="fa-regular fa-calendar-days"></i> ${prefix} ${dayText}</span>`;
+    }
+
+    // -----------------------------------------------------------------------
+    // 6. LIVE GOOGLE MAP & PROBLEM POINTERS CONTROLLER
+    // -----------------------------------------------------------------------
+    function buildGoogleMapPointersHtml(issuesList, isAdmin = false) {
+      return issuesList.map(issue => {
+        const isSelected = state.selectedMapIssueId === issue.id;
+        const posX = isSelected ? 50 : issue.mapX;
+        const posY = isSelected ? 48 : issue.mapY;
+
+        const pinColor = issue.status === 'Resolved'
+          ? 'bg-emerald-600 border-emerald-200'
+          : issue.status === 'In Progress'
+            ? 'bg-blue-600 border-blue-200'
+            : 'bg-amber-500 border-amber-200';
+        const ringColor = issue.status === 'Resolved'
+          ? 'bg-emerald-400'
+          : issue.status === 'In Progress'
+            ? 'bg-blue-400'
+            : 'bg-amber-400';
+
+        return `
+          <button type="button"
+            onclick="focusIssueOnMap('${issue.id}', ${isAdmin}, true)"
+            style="left: ${posX}%; top: ${posY}%;"
+            title="${issue.id}: ${issue.title}"
+            class="group absolute -translate-x-1/2 -translate-y-1/2 focus:outline-none transition-all duration-300 ${isSelected ? 'z-30' : 'z-10'}">
+            <span class="pin-pulse absolute inset-0 rounded-full ${ringColor}"></span>
+            ${isSelected ? `
+              <div class="mb-1.5 px-2.5 py-1 rounded-lg bg-slate-900/95 text-white text-[10px] font-bold shadow-xl border border-white/20 whitespace-nowrap flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
+                <span>${issue.id}: ${issue.location.split(',')[0]}</span>
+              </div>
+            ` : ''}
+            <span class="relative inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${pinColor} text-white border-2 shadow-lg text-[10px] font-extrabold transition-transform ${isSelected ? 'scale-125 ring-4 ring-blue-500/50' : 'group-hover:scale-110'}">
+              <i class="fa-solid fa-location-dot"></i>
+              <span>${issue.id.split('-').pop()}</span>
+            </span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setMapType(type) {
+      state.mapType = type;
+      renderDigitalMap();
+    }
+
+    function focusIssueOnMap(id, isAdmin = false, shouldScroll = true) {
+      state.selectedMapIssueId = id;
+      if (isAdmin) {
+        renderAdminDashboard();
+        if (shouldScroll) {
+          document.getElementById('adminDigitalMap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      } else {
+        renderDigitalMap();
+        if (shouldScroll) {
+          document.getElementById('citizenDigitalMap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      const targetIssue = state.issues.find(i => i.id === id);
+      if (targetIssue) {
+        showToast(`Pointing to ${targetIssue.id} at ${targetIssue.location}`, 'info');
+      }
+    }
+
+    function renderDigitalMap() {
+      const mapEl = document.getElementById('citizenDigitalMap');
+      if (!mapEl) return;
+
+      const catFilter = document.getElementById('mapCategoryFilter')?.value || 'ALL';
+      const filtered = state.issues.filter(i => catFilter === 'ALL' || i.category === catFilter);
+      const selectedIssue = filtered.find(i => i.id === state.selectedMapIssueId) || filtered[0] || null;
+      if (selectedIssue && !state.selectedMapIssueId) {
+        state.selectedMapIssueId = selectedIssue.id;
+      }
+
+      const mapQuery = encodeURIComponent(selectedIssue ? selectedIssue.location : 'Coimbatore, Tamil Nadu, India');
+      const zoomLevel = selectedIssue ? 17 : 13;
+
+      mapEl.innerHTML = `
+        <iframe title="Live Civic Google Map" src="https://maps.google.com/maps?q=${mapQuery}&t=${state.mapType}&z=${zoomLevel}&output=embed" class="w-full h-full border-0"></iframe>
+        <div class="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-white/95 backdrop-blur px-2 py-1 rounded-xl border border-slate-200 shadow-sm text-[11px] font-bold">
+          <button type="button" onclick="setMapType('m')" class="px-2.5 py-1 rounded-lg ${state.mapType === 'm' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'}">Map</button>
+          <button type="button" onclick="setMapType('k')" class="px-2.5 py-1 rounded-lg ${state.mapType === 'k' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:bg-slate-100'}">Satellite</button>
+        </div>
+        ${selectedIssue ? `
+          <div class="absolute bottom-3 left-3 right-3 sm:right-auto z-20 bg-slate-900/90 backdrop-blur-md text-white px-3.5 py-2 rounded-xl border border-white/15 shadow-lg flex items-center gap-2.5 text-xs">
+            <i class="fa-solid fa-crosshairs text-rose-400 animate-pulse"></i>
+            <div class="truncate">
+              <span class="font-extrabold text-amber-300">${selectedIssue.id}</span>
+              <span class="text-slate-200 ml-1">• ${selectedIssue.location}</span>
+            </div>
+          </div>
+        ` : ''}
+        <div class="pointer-events-none absolute inset-0">
+          <div class="pointer-events-auto">${buildGoogleMapPointersHtml(filtered, false)}</div>
+        </div>
+      `;
+
+      const inspectorEl = document.getElementById('mapInspectorContent');
+      if (inspectorEl && selectedIssue) {
+        inspectorEl.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-1.5">
+            ${getPriorityBadgeHtml(selectedIssue.severity)}
+            ${getDaysExistingBadgeHtml(selectedIssue)}
+            ${getStatusBadgeHtml(selectedIssue.status)}
+          </div>
+          <img src="${selectedIssue.beforePhoto}" alt="Evidence" class="w-full h-32 object-cover rounded-xl border border-slate-200" />
+          <div>
+            <div class="text-xs font-extrabold text-slate-900">${selectedIssue.id} — ${selectedIssue.title}</div>
+            <p class="text-[11px] text-slate-500 mt-1"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${selectedIssue.location}</p>
+          </div>
+          <div class="p-2.5 rounded-xl bg-white border border-slate-200 text-[11px] space-y-1">
+            <div><strong>Category:</strong> ${selectedIssue.category}</div>
+            <div><strong>Department:</strong> ${selectedIssue.department}</div>
+            <div><strong>Officer:</strong> ${selectedIssue.officer}</div>
+          </div>
+          <button type="button" onclick="openIssueModal('${selectedIssue.id}')" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition">
+            Inspect Full Timeline &amp; Photos
+          </button>
+        `;
+      }
+
+      const dirCount = document.getElementById('mapDirectoryCount');
+      const dirList = document.getElementById('citizenMapProblemsList');
+      if (dirCount) dirCount.textContent = `${filtered.length} Issues`;
+      if (dirList) {
+        dirList.innerHTML = filtered.map(issue => {
+          const isSelected = state.selectedMapIssueId === issue.id;
+          return `
+            <button type="button" onclick="focusIssueOnMap('${issue.id}', false, true)" class="text-left p-3.5 rounded-xl border transition ${isSelected ? 'border-blue-600 bg-blue-50/70 ring-2 ring-blue-500/25 shadow-sm' : 'border-slate-200 bg-slate-50/70 hover:border-blue-400'}">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                  ${isSelected ? '<i class="fa-solid fa-location-crosshairs text-blue-600"></i>' : ''}
+                  <span>${issue.id}</span>
+                </span>
+                ${getStatusBadgeHtml(issue.status)}
+              </div>
+              <div class="text-xs font-bold text-slate-800 mt-1.5 line-clamp-1">${issue.title}</div>
+              <div class="text-[11px] text-slate-500 mt-1 truncate"><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${issue.location}</div>
+              <div class="mt-2">${getDaysExistingBadgeHtml(issue)}</div>
+            </button>
+          `;
+        }).join('');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 7. ISSUE TRACKING DASHBOARD & PUBLIC FEED
+    // -----------------------------------------------------------------------
+    function renderMyAppliedComplaints() {
+      const lookupInput = document.getElementById('myIssuesLookupInput');
+      const statusFilter = document.getElementById('trackingStatusFilter')?.value || 'ALL';
+      const query = (lookupInput?.value || '').trim().toLowerCase();
+
+      const matchedByUser = state.issues.filter(i =>
+        !query ||
+        (i.citizenContact && i.citizenContact.toLowerCase().includes(query)) ||
+        (i.citizenName && i.citizenName.toLowerCase().includes(query)) ||
+        (i.id && i.id.toLowerCase().includes(query))
+      );
+
+      const mine = matchedByUser.filter(i => statusFilter === 'ALL' || i.status === statusFilter);
+
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      setTxt('myStatTotal', matchedByUser.length);
+      setTxt('myStatOpen', matchedByUser.filter(i => i.status === 'Reported').length);
+      setTxt('myStatInProgress', matchedByUser.filter(i => i.status === 'In Progress').length);
+      setTxt('myStatResolved', matchedByUser.filter(i => i.status === 'Resolved').length);
+
+      const listEl = document.getElementById('myAppliedComplaintsList');
+      if (!listEl) return;
+
+      if (mine.length === 0) {
+        listEl.innerHTML = `
+          <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center space-y-2">
+            <div class="text-3xl">📋</div>
+            <h3 class="font-bold text-sm text-slate-900">No Complaints Match Current Filter</h3>
+            <p class="text-xs text-slate-500">Click "Show All" or report a new civic issue using the Gemini AI Complaint Form.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = mine.map(issue => {
+        const progressPct = issue.status === 'Resolved' ? 100 : issue.status === 'In Progress' ? 65 : 25;
+        const canWithdraw = issue.status === 'Reported';
+        return `
+          <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-md bg-slate-900 text-white text-xs font-bold">${issue.id}</span>
+                ${getStatusBadgeHtml(issue.status)}
+                ${getPriorityBadgeHtml(issue.severity)}
+                ${getDaysExistingBadgeHtml(issue)}
+                <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">${issue.category}</span>
+              </div>
+              <span class="text-xs text-slate-500">Citizen: <strong>${issue.citizenName}</strong> (${issue.citizenContact})</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+              <div class="md:col-span-8 space-y-2">
+                <h3 class="font-bold text-base text-slate-900">${issue.title}</h3>
+                <p class="text-xs text-slate-600 leading-relaxed">${issue.description}</p>
+                <div class="text-xs text-slate-500 flex flex-wrap gap-4 pt-1">
+                  <span><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${issue.location}</span>
+                  <span><i class="fa-solid fa-building text-indigo-600 mr-1"></i>${issue.department}</span>
+                  <span><i class="fa-solid fa-user-tie text-blue-600 mr-1"></i>${issue.officer}</span>
+                </div>
+              </div>
+              <div class="md:col-span-4">
+                <img src="${issue.afterPhoto || issue.beforePhoto}" alt="Evidence" class="w-full h-28 object-cover rounded-xl border border-slate-200" />
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-[11px] font-bold text-slate-500">
+                <span>Workflow Stage: Reported → In Progress → Resolved</span>
+                <span>${progressPct}%</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div class="h-full rounded-full ${issue.status === 'Resolved' ? 'bg-emerald-500' : issue.status === 'In Progress' ? 'bg-blue-600' : 'bg-amber-500'}" style="width: ${progressPct}%"></div>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                ${canWithdraw ? `
+                  <button type="button" onclick="withdrawCitizenComplaint('${issue.id}')" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition">
+                    <i class="fa-solid fa-trash-can mr-1"></i> Withdraw Complaint
+                  </button>
+                ` : `<span class="text-[11px] text-slate-400 font-medium"><i class="fa-solid fa-lock mr-1"></i>Active municipal execution</span>`}
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="openCitizenReceiptModal('${issue.id}')" class="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition">
+                  <i class="fa-solid fa-file-invoice mr-1"></i> Official Receipt
+                </button>
+                <button type="button" onclick="state.selectedMapIssueId='${issue.id}'; navigateToPage('map');" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition">
+                  <i class="fa-solid fa-map-pin mr-1 text-rose-500"></i> View on Map
+                </button>
+                <button type="button" onclick="openIssueModal('${issue.id}')" class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">
+                  Track Timeline
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function withdrawCitizenComplaint(id) {
+      const idx = state.issues.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      state.issues.splice(idx, 1);
+      updateGlobalStats();
+      renderMyAppliedComplaints();
+      renderCitizenFeed();
+      showToast(`Complaint ${id} withdrawn from municipal queue.`, 'info');
+    }
+
+    function openCitizenReceiptModal(id) {
+      const issue = state.issues.find(i => i.id === id);
+      if (!issue) return;
+      const days = Math.floor((issue.hoursElapsed || 0) / 24);
+      document.getElementById('officialDocModalTitle').innerHTML = `<i class="fa-solid fa-file-invoice text-amber-400"></i><span>Official Citizen Complaint Receipt — ${issue.id}</span>`;
+      document.getElementById('printableReceiptArea').innerHTML = `
+        <div class="border-2 border-slate-900 rounded-2xl p-6 space-y-4 bg-white">
+          <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4">
+            <div>
+              <div class="text-[10px] font-extrabold uppercase tracking-widest text-blue-700">Municipal Corporation Civic Grievance Portal</div>
+              <h2 class="text-lg font-extrabold text-slate-900 mt-0.5">CIVICRESOLVE ACKNOWLEDGEMENT RECEIPT</h2>
+              <p class="text-[11px] text-slate-500">Gemini AI Triaged • Duration Existing: ${days} Day(s) (${issue.hoursElapsed} hrs)</p>
+            </div>
+            <div class="text-right">
+              <div class="px-3 py-1 rounded-lg bg-slate-900 text-white font-mono font-bold text-sm">${issue.id}</div>
+              <div class="text-[10px] font-bold text-emerald-700 mt-1">STATUS: ${issue.status.toUpperCase()}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Applicant Name</span><strong>${issue.citizenName}</strong></div>
+            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Verified Contact</span><strong>${issue.citizenContact}</strong></div>
+            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">AI Category &amp; Priority</span><strong>${issue.category} (${issue.severity})</strong></div>
+            <div><span class="text-slate-400 block text-[10px] uppercase font-bold">Recommended Department</span><strong>${issue.department}</strong></div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="text-[10px] font-bold uppercase text-slate-400">Grievance Subject &amp; Geo-Location</div>
+            <div class="font-bold text-sm text-slate-900">${issue.title}</div>
+            <p class="text-slate-600 leading-relaxed">${issue.description}</p>
+            <div class="font-semibold text-slate-700 pt-1">📍 ${issue.location}</div>
+          </div>
+
+          <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-between">
+            <div>
+              <div class="font-bold text-blue-950">Assigned Municipal Engineer</div>
+              <div class="text-blue-800">${issue.officer}</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-white text-blue-900 font-bold border border-blue-200">Existing: ${days} Day(s)</span>
+          </div>
+        </div>
+      `;
+      document.getElementById('officialDocumentModal').classList.remove('hidden');
+    }
+
+    function openDailyWardSummaryModal() {
+      const officer = state.authorityOfficer || { name: 'Duty Municipal Officer', designation: 'Zonal Officer', empId: 'GOV-01', zone: 'Central Zone' };
+      const solved = state.issues.filter(i => i.status === 'Resolved');
+      const unsolved = state.issues.filter(i => i.status !== 'Resolved');
+
+      document.getElementById('officialDocModalTitle').innerHTML = `<i class="fa-solid fa-file-shield text-emerald-400"></i><span>Daily Municipal Ward Audit &amp; Evidence Summary</span>`;
+      document.getElementById('printableReceiptArea').innerHTML = `
+        <div class="border-2 border-slate-900 rounded-2xl p-6 space-y-4 bg-white">
+          <div class="flex items-center justify-between border-b-2 border-slate-900 pb-4">
+            <div>
+              <div class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700">Official Municipal Audit Documentation</div>
+              <h2 class="text-lg font-extrabold text-slate-900">DAILY WARD GRIEVANCE &amp; EVIDENCE REPORT</h2>
+              <p class="text-[11px] text-slate-500">Generated on 21 Nov 2026 • Jurisdiction: ${officer.zone}</p>
+            </div>
+            <div class="text-right text-[11px]">
+              <div class="font-extrabold text-slate-900">${officer.name}</div>
+              <div class="text-slate-600">${officer.designation}</div>
+              <div class="font-mono text-slate-500">ID: ${officer.empId}</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="p-3 rounded-xl bg-slate-100"><div class="text-[10px] font-bold uppercase text-slate-500">Total Tickets</div><div class="text-lg font-extrabold">${state.issues.length}</div></div>
+            <div class="p-3 rounded-xl bg-amber-50"><div class="text-[10px] font-bold uppercase text-amber-700">Active Queue</div><div class="text-lg font-extrabold text-amber-900">${unsolved.length}</div></div>
+            <div class="p-3 rounded-xl bg-emerald-50"><div class="text-[10px] font-bold uppercase text-emerald-700">Resolved &amp; Archived</div><div class="text-lg font-extrabold text-emerald-900">${solved.length}</div></div>
+          </div>
+
+          <div class="space-y-2">
+            <div class="font-extrabold text-xs uppercase text-emerald-800">Resolved &amp; Photo-Verified Evidence Records (${solved.length})</div>
+            ${solved.map(s => `
+              <div class="p-3 rounded-xl border border-emerald-200 bg-emerald-50/40 space-y-1">
+                <div class="font-bold text-slate-900">${s.id} — ${s.title} (${s.location}) • Resolved in ${Math.floor((s.hoursElapsed || 0) / 24)} day(s)</div>
+                <div class="text-slate-600">Signed By: <strong>${s.officer}</strong> • Closed: ${s.resolvedAt || 'Verified'}</div>
+                <div class="text-slate-600">Remarks: ${s.resolutionRemarks || 'Before & After photographic evidence verified.'}</div>
+              </div>
+            `).join('') || '<div class="text-slate-400">No resolved records yet.</div>'}
+          </div>
+
+          <div class="space-y-2">
+            <div class="font-extrabold text-xs uppercase text-rose-800">Active Action Queue (${unsolved.length})</div>
+            ${unsolved.map(u => `
+              <div class="p-2.5 rounded-xl border border-slate-200 flex items-center justify-between">
+                <div><strong>${u.id}</strong> [${u.severity} • ${Math.floor((u.hoursElapsed || 0) / 24)}d existing]: ${u.title} <span class="text-slate-500">(${u.department})</span></div>
+                <span class="font-bold uppercase text-[10px]">${u.status}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('officialDocumentModal').classList.remove('hidden');
+    }
+
+    function copyOfficialDocumentText() {
+      const text = document.getElementById('printableReceiptArea')?.innerText || '';
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showToast('Official document copied to clipboard!', 'success');
+      } catch (e) {
+        showToast('Document ready for printing.', 'info');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function toggleUpvote(id) {
+      const issue = state.issues.find(i => i.id === id);
+      if (!issue) return;
+      if (state.upvotedIds.has(id)) {
+        state.upvotedIds.delete(id);
+        issue.upvotes = Math.max(1, issue.upvotes - 1);
+      } else {
+        state.upvotedIds.add(id);
+        issue.upvotes += 1;
+        state.citizenPoints += 5;
+        showToast('Community validation recorded! +5 Impact Points', 'success');
+      }
+      updateGlobalStats();
+      renderCitizenFeed();
+    }
+
+    function renderCitizenFeed() {
+      const searchQ = (document.getElementById('feedSearchInput')?.value || '').trim().toLowerCase();
+      const catFilter = document.getElementById('feedCategoryFilter')?.value || 'ALL';
+      const statusFilter = document.getElementById('feedStatusFilter')?.value || 'ALL';
+
+      const filtered = state.issues.filter(i => {
+        const matchQ = !searchQ || i.id.toLowerCase().includes(searchQ) || i.title.toLowerCase().includes(searchQ) || i.location.toLowerCase().includes(searchQ);
+        const matchCat = catFilter === 'ALL' || i.category === catFilter;
+        const matchStatus = statusFilter === 'ALL' || i.status === statusFilter;
+        return matchQ && matchCat && matchStatus;
+      });
+
+      const listEl = document.getElementById('citizenIssuesList');
+      if (listEl) {
+        listEl.innerHTML = filtered.map(issue => {
+          const isUpvoted = state.upvotedIds.has(issue.id);
+          return `
+            <article class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2.5 py-0.5 rounded-md bg-slate-900 text-white text-xs font-bold">${issue.id}</span>
+                  ${getStatusBadgeHtml(issue.status)}
+                  ${getPriorityBadgeHtml(issue.severity)}
+                  ${getDaysExistingBadgeHtml(issue)}
+                  <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">${issue.category}</span>
+                </div>
+                <span class="text-[11px] text-slate-500">Reported by <strong>${issue.citizenName}</strong> (${issue.citizenWard || 'Ward Verified'})</span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+                <div class="sm:col-span-8 space-y-1.5">
+                  <h3 class="font-bold text-base text-slate-900">${issue.title}</h3>
+                  <p class="text-xs text-slate-600 leading-relaxed">${issue.description}</p>
+                  <div class="text-xs text-slate-500 pt-1 flex flex-wrap gap-3">
+                    <span><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${issue.location}</span>
+                    <span><i class="fa-solid fa-building text-indigo-600 mr-1"></i>${issue.department}</span>
+                  </div>
+                </div>
+                <div class="sm:col-span-4">
+                  <img src="${issue.beforePhoto}" alt="Issue photo" class="w-full h-28 object-cover rounded-xl border border-slate-200" />
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <button type="button" onclick="toggleUpvote('${issue.id}')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1.5 ${isUpvoted ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'}">
+                  <i class="fa-solid fa-thumbs-up"></i>
+                  <span>Validate (${issue.upvotes})</span>
+                </button>
+                <div class="flex items-center gap-2">
+                  <button type="button" onclick="state.selectedMapIssueId='${issue.id}'; navigateToPage('map');" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold">
+                    <i class="fa-solid fa-map-location-dot mr-1"></i> Map
+                  </button>
+                  <button type="button" onclick="openIssueModal('${issue.id}')" class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold">
+                    Details &amp; Proof
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      const leaderboardEl = document.getElementById('leaderboardList');
+      if (leaderboardEl) {
+        const guardians = [
+          { name: 'Karthik Subramanian', ward: 'Ward 24', pts: state.citizenPoints, badge: '🥇' },
+          { name: 'Priya Dharshini', ward: 'Ward 22', pts: 125, badge: '🥈' },
+          { name: 'Aravind Swaminathan', ward: 'Ward 36', pts: 110, badge: '🥉' }
+        ];
+        leaderboardEl.innerHTML = guardians.map(g => `
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="flex items-center gap-2.5">
+              <span class="text-base">${g.badge}</span>
+              <div>
+                <div class="text-xs font-bold text-slate-900">${g.name}</div>
+                <div class="text-[11px] text-slate-500">${g.ward}</div>
+              </div>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 text-xs font-extrabold">${g.pts} pts</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 8. ADMIN OFFICER ONBOARDING & SUB-PAGE CONTROLLER
+    // -----------------------------------------------------------------------
+    function renderAuthorityPortalView() {
+      const onboardingEl = document.getElementById('authorityOnboardingPage');
+      const workspaceEl = document.getElementById('authorityWorkspace');
+      if (!onboardingEl || !workspaceEl) return;
+
+      if (!state.authorityOfficer) {
+        onboardingEl.classList.remove('hidden');
+        workspaceEl.classList.add('hidden');
+        return;
+      }
+
+      onboardingEl.classList.add('hidden');
+      workspaceEl.classList.remove('hidden');
+
+      const off = state.authorityOfficer;
+      document.getElementById('activeOfficerNameDisplay').textContent = off.name;
+      document.getElementById('activeOfficerDesignationBadge').textContent = off.designation;
+      document.getElementById('activeOfficerEmpIdBadge').textContent = `ID: ${off.empId}`;
+      document.getElementById('activeOfficerMetaDisplay').textContent = `${off.zone} • ${off.department === 'ALL' ? 'All Municipal Departments' : off.department} • ${off.contact}`;
+
+      const deptSelect = document.getElementById('adminDeptFilter');
+      if (deptSelect && off.department !== 'ALL') {
+        deptSelect.value = off.department;
+      }
+
+      updateGlobalStats();
+      switchAuthoritySubPage(state.authoritySubPage || 'queue');
+      renderAdminDashboard();
+    }
+
+    function fillDemoOfficerProfile() {
+      document.getElementById('authOfficerNameInput').value = 'Er. R. Karthikeyan';
+      document.getElementById('authOfficerDesignationInput').value = 'Assistant Executive Engineer (AEE)';
+      document.getElementById('authOfficerEmpIdInput').value = 'TN-CCMC-4082';
+      document.getElementById('authOfficerDeptInput').value = 'ALL';
+      document.getElementById('authOfficerZoneInput').value = 'Central Zone (Wards 20–40)';
+      document.getElementById('authOfficerContactInput').value = 'karthikeyan.aee@tn.gov.in';
+      showToast('Sample Admin Credentials filled!', 'info');
+    }
+
+    function saveAuthorityOfficerProfile(event) {
+      event.preventDefault();
+      const name = document.getElementById('authOfficerNameInput').value.trim();
+      const designation = document.getElementById('authOfficerDesignationInput').value.trim();
+      const empId = document.getElementById('authOfficerEmpIdInput').value.trim();
+      const department = document.getElementById('authOfficerDeptInput').value;
+      const zone = document.getElementById('authOfficerZoneInput').value.trim();
+      const contact = document.getElementById('authOfficerContactInput').value.trim();
+
+      state.authorityOfficer = { name, designation, empId, department, zone, contact };
+      state.loggedInUser = { role: 'admin', identifier: `${name} (${empId})` };
+      updateHeaderLoginPill();
+      renderAuthorityPortalView();
+      showToast(`Signed in as ${name} (${empId})`, 'success');
+    }
+
+    function editAuthorityOfficerProfile() {
+      if (state.authorityOfficer) {
+        document.getElementById('authOfficerNameInput').value = state.authorityOfficer.name;
+        document.getElementById('authOfficerDesignationInput').value = state.authorityOfficer.designation;
+        document.getElementById('authOfficerEmpIdInput').value = state.authorityOfficer.empId;
+        document.getElementById('authOfficerDeptInput').value = state.authorityOfficer.department;
+        document.getElementById('authOfficerZoneInput').value = state.authorityOfficer.zone;
+        document.getElementById('authOfficerContactInput').value = state.authorityOfficer.contact;
+      }
+      document.getElementById('authorityWorkspace')?.classList.add('hidden');
+      document.getElementById('authorityOnboardingPage')?.classList.remove('hidden');
+    }
+
+    function switchAuthoritySubPage(subKey) {
+      state.authoritySubPage = subKey;
+      const queueSec = document.getElementById('authoritySubPageQueue');
+      const mapSec = document.getElementById('authoritySubPageMap');
+      const btnQueue = document.getElementById('authSubBtnQueue');
+      const btnMap = document.getElementById('authSubBtnMap');
+
+      if (subKey === 'map') {
+        queueSec?.classList.add('hidden');
+        mapSec?.classList.remove('hidden');
+        if (btnMap) btnMap.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-sm';
+        if (btnQueue) btnQueue.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white';
+        renderAdminDashboard();
+      } else {
+        mapSec?.classList.add('hidden');
+        queueSec?.classList.remove('hidden');
+        if (btnQueue) btnQueue.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-sm';
+        if (btnMap) btnMap.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-300 hover:text-white';
+      }
+    }
+
+    // -----------------------------------------------------------------------
+    // 9. ADMIN WORKBENCH (ACTIVE VS RESOLVED EVIDENCE COLUMNS)
+    // -----------------------------------------------------------------------
+    function renderAdminDashboard() {
+      const deptFilter = document.getElementById('adminDeptFilter')?.value || 'ALL';
+      const priorityFilter = document.getElementById('adminPriorityFilter')?.value || 'ALL';
+      const searchQ = (document.getElementById('adminSearchInput')?.value || '').trim().toLowerCase();
+
+      const priorityRank = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+
+      const filtered = state.issues.filter(i => {
+        const matchesDept = deptFilter === 'ALL' || i.department === deptFilter;
+        const matchesPriority = priorityFilter === 'ALL' || i.severity === priorityFilter;
+        const matchesQ = !searchQ ||
+          i.id.toLowerCase().includes(searchQ) ||
+          i.location.toLowerCase().includes(searchQ) ||
+          i.title.toLowerCase().includes(searchQ) ||
+          (i.officer && i.officer.toLowerCase().includes(searchQ));
+        return matchesDept && matchesPriority && matchesQ;
+      });
+
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+      const adminMapEl = document.getElementById('adminDigitalMap');
+      const activeIssue = state.issues.find(i => i.id === state.selectedMapIssueId);
+      const mapQuery = encodeURIComponent(activeIssue ? activeIssue.location : 'Coimbatore, Tamil Nadu, India');
+      if (adminMapEl) {
+        adminMapEl.innerHTML = `
+          <iframe title="Admin Geospatial Map" src="https://maps.google.com/maps?q=${mapQuery}&t=${state.mapType}&z=${activeIssue ? 17 : 13}&output=embed" class="w-full h-full border-0"></iframe>
+          <div class="pointer-events-none absolute inset-0">
+            <div class="pointer-events-auto">${buildGoogleMapPointersHtml(filtered, true)}</div>
+          </div>
+        `;
+      }
+
+      const adminDirEl = document.getElementById('adminMapProblemsList');
+      const adminCountEl = document.getElementById('adminMapDirectoryCount');
+      if (adminCountEl) adminCountEl.textContent = `${filtered.length} Active`;
+      if (adminDirEl) {
+        adminDirEl.innerHTML = filtered.map(i => `
+          <button type="button" onclick="focusIssueOnMap('${i.id}', true, true)" class="text-left p-3 rounded-xl border border-slate-200 hover:border-blue-500 bg-slate-50/70 transition">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-900">${i.id}</span>
+              ${getStatusBadgeHtml(i.status)}
+            </div>
+            <div class="text-xs font-semibold text-slate-700 truncate mt-1">${i.title}</div>
+            <div class="mt-1.5">${getDaysExistingBadgeHtml(i)}</div>
+          </button>
+        `).join('');
+      }
+
+      const unsolvedIssues = filtered
+        .filter(i => i.status !== 'Resolved')
+        .sort((a, b) => (priorityRank[b.severity] || 0) - (priorityRank[a.severity] || 0));
+      const solvedIssues = filtered.filter(i => i.status === 'Resolved');
+
+      setTxt('unsolvedColumnCount', `${unsolvedIssues.length} Active`);
+      setTxt('solvedColumnCount', `${solvedIssues.length} Resolved`);
+
+      const unsolvedCol = document.getElementById('adminUnsolvedColumn');
+      if (unsolvedCol) {
+        if (unsolvedIssues.length === 0) {
+          unsolvedCol.innerHTML = `
+            <div class="p-8 text-center rounded-xl border border-dashed border-slate-200 bg-slate-50/60 space-y-1.5">
+              <div class="text-2xl">🎉</div>
+              <div class="text-xs font-bold text-slate-800">All Filtered Grievances Resolved!</div>
+              <p class="text-[11px] text-slate-500">Every submitted complaint in this department has been documented in the Resolved column.</p>
+            </div>
+          `;
+        } else {
+          unsolvedCol.innerHTML = unsolvedIssues.map(issue => {
+            const isOverdue = issue.hoursElapsed > 48;
+            return `
+              <div class="rounded-xl border ${issue.severity === 'Critical' ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200 bg-white'} p-4 shadow-sm hover:shadow transition space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded-md bg-slate-900 text-white text-[11px] font-bold">${issue.id}</span>
+                    ${getStatusBadgeHtml(issue.status)}
+                    ${getPriorityBadgeHtml(issue.severity)}
+                    ${getDaysExistingBadgeHtml(issue)}
+                  </div>
+                  <span class="text-[11px] font-bold ${isOverdue ? 'text-rose-600' : 'text-slate-500'}">
+                    <i class="fa-regular fa-clock mr-1"></i>${isOverdue ? `Overdue (+${issue.hoursElapsed - 48}h)` : `${48 - issue.hoursElapsed}h SLA left`}
+                  </span>
+                </div>
+
+                <div class="grid grid-cols-12 gap-3 items-center">
+                  <div class="col-span-8 space-y-1">
+                    <h5 class="font-bold text-xs sm:text-sm text-slate-900 leading-snug">${issue.title}</h5>
+                    <p class="text-[11px] text-slate-600 line-clamp-2">${issue.description}</p>
+                    <div class="text-[11px] text-slate-500 pt-0.5">
+                      <div><i class="fa-solid fa-location-dot text-rose-500 mr-1"></i>${issue.location}</div>
+                      <div><i class="fa-solid fa-building text-blue-600 mr-1"></i>${issue.department} • ${issue.category}</div>
+                    </div>
+                  </div>
+                  <div class="col-span-4">
+                    <img src="${issue.beforePhoto}" alt="Submitted Evidence" class="w-full h-20 object-cover rounded-lg border border-slate-200" />
+                    <span class="block text-[9px] text-center font-semibold text-slate-400 mt-0.5">Submitted Photo</span>
+                  </div>
+                </div>
+
+                <div class="pt-2.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                  <button type="button" onclick="openIssueModal('${issue.id}')" class="px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[11px] font-semibold transition">
+                    <i class="fa-solid fa-timeline mr-1"></i> Audit Trail
+                  </button>
+                  <button type="button" onclick="openResolveModal('${issue.id}')" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-emerald-600 text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-check-to-slot"></i>
+                    <span>Update Status / Resolve</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      const solvedCol = document.getElementById('adminSolvedColumn');
+      if (solvedCol) {
+        if (solvedIssues.length === 0) {
+          solvedCol.innerHTML = `
+            <div class="p-8 text-center rounded-xl border border-dashed border-emerald-200 bg-emerald-50/40 space-y-1.5">
+              <div class="text-2xl">🗂️</div>
+              <div class="text-xs font-bold text-slate-800">No Resolved Evidence Records Yet</div>
+              <p class="text-[11px] text-slate-500">Click "Update Status / Resolve" on any active problem to store its Before/After documentation here.</p>
+            </div>
+          `;
+        } else {
+          solvedCol.innerHTML = solvedIssues.map(issue => {
+            const isNewlyResolved = state.lastResolvedIssueId === issue.id;
+            return `
+            <div id="resolved-card-${issue.id}" class="rounded-xl border ${isNewlyResolved ? 'border-emerald-500 bg-emerald-50/70 ring-2 ring-emerald-500/30' : 'border-emerald-200 bg-emerald-50/25'} p-4 shadow-sm space-y-3 transition-all">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-700 text-white text-[11px] font-bold">${issue.id}</span>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <i class="fa-solid fa-file-shield mr-1"></i>RESOLVED &amp; VERIFIED
+                  </span>
+                  ${getDaysExistingBadgeHtml(issue)}
+                </div>
+                <span class="text-[11px] font-semibold text-emerald-800">${issue.resolvedAt || 'Documented Today'}</span>
+              </div>
+
+              <div>
+                <h5 class="font-bold text-xs sm:text-sm text-slate-900">${issue.title}</h5>
+                <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-solid fa-location-dot text-emerald-600 mr-1"></i>${issue.location} • ${issue.department}</p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2.5 bg-white p-2.5 rounded-xl border border-emerald-100">
+                <div>
+                  <img src="${issue.beforePhoto}" alt="Before Evidence" class="w-full h-24 object-cover rounded-lg border border-slate-200" />
+                  <div class="text-[10px] font-bold text-slate-500 mt-1 text-center">1. Submitted Evidence (Before)</div>
+                </div>
+                <div>
+                  <img src="${issue.afterPhoto || SAMPLE_PHOTOS.resolved}" alt="After Proof" class="w-full h-24 object-cover rounded-lg border border-emerald-300" />
+                  <div class="text-[10px] font-bold text-emerald-700 mt-1 text-center">2. Resolution Proof (After)</div>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-xl bg-white border border-slate-200 text-[11px] space-y-1">
+                <div class="text-slate-700"><strong>Signed By:</strong> ${issue.officer}</div>
+                <div class="text-slate-600"><strong>Citizen Applicant:</strong> ${issue.citizenName} (${issue.citizenContact})</div>
+                ${issue.resolutionRemarks ? `<div class="text-slate-600"><strong>Field Remarks:</strong> ${issue.resolutionRemarks}</div>` : ''}
+              </div>
+
+              <div class="pt-1 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <button type="button" onclick="openIssueModal('${issue.id}')" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold transition">
+                    <i class="fa-solid fa-eye mr-1"></i> Full Evidence Dossier
+                  </button>
+                  <button type="button" onclick="viewResolvedInTracking('${issue.id}')" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold transition">
+                    <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> View in Submitted Tracking
+                  </button>
+                </div>
+                <button type="button" onclick="exportEvidenceDossier('${issue.id}')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition flex items-center gap-1">
+                  <i class="fa-solid fa-file-export"></i>
+                  <span>Copy Audit Record</span>
+                </button>
+              </div>
+            </div>
+          `;
+          }).join('');
+        }
+      }
+    }
+
+    function viewResolvedInTracking(id) {
+      const lookupInput = document.getElementById('myIssuesLookupInput');
+      const statusFilter = document.getElementById('trackingStatusFilter');
+      if (lookupInput) lookupInput.value = id;
+      if (statusFilter) statusFilter.value = 'Resolved';
+      navigateToPage('myissues');
+    }
+
+    // -----------------------------------------------------------------------
+    // 10. VOICE COMPLAINT ASSISTANT
+    // -----------------------------------------------------------------------
+    let speechRecognitionInstance = null;
+    let isListeningVoice = false;
+
+    function openVoiceReportAssistant() {
+      navigateToPage('report');
+      speakAssistantGuide("Welcome to the CivicResolve Voice Assistant. Tap Start Speaking or choose a voice demo to fill your complaint automatically.");
+    }
+
+    function speakAssistantGuide(customText) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const text = customText || "Please speak your name, ward location, and describe the civic issue. Gemini AI will classify and fill out the form for you.";
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.rate = 1.02;
+      window.speechSynthesis.speak(utter);
+    }
+
+    function toggleVoiceComplaintAssistant() {
+      const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRec) {
+        simulateVoiceComplaint('pothole');
+        return;
+      }
+
+      if (isListeningVoice && speechRecognitionInstance) {
+        speechRecognitionInstance.stop();
+        isListeningVoice = false;
+        document.getElementById('voiceToggleBtnLabel').textContent = 'Start Speaking';
+        return;
+      }
+
+      speechRecognitionInstance = new SpeechRec();
+      speechRecognitionInstance.lang = 'en-IN';
+      speechRecognitionInstance.interimResults = false;
+
+      speechRecognitionInstance.onstart = () => {
+        isListeningVoice = true;
+        document.getElementById('voiceToggleBtnLabel').textContent = 'Listening...';
+        document.getElementById('voiceStatusBadge').textContent = 'Listening Live';
+      };
+
+      speechRecognitionInstance.onresult = event => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('voiceTranscriptText').textContent = `"${transcript}"`;
+        applyVoiceTranscriptToForm(transcript);
+      };
+
+      speechRecognitionInstance.onerror = () => simulateVoiceComplaint('pothole');
+      speechRecognitionInstance.onend = () => {
+        isListeningVoice = false;
+        document.getElementById('voiceToggleBtnLabel').textContent = 'Start Speaking';
+        document.getElementById('voiceStatusBadge').textContent = 'Ready (EN / TA / HI)';
+      };
+
+      speechRecognitionInstance.start();
+    }
+
+    function simulateVoiceComplaint(preset) {
+      const samples = {
+        pothole: {
+          transcript: "My name is Karthik from Ward 24 RS Puram. There is a dangerous deep pothole near Flower Market main road.",
+          name: "Karthik Subramanian",
+          contact: "+91 98422 11045",
+          ward: "Ward 24, RS Puram",
+          title: "Dangerous deep pothole near Flower Market main road",
+          category: "Roads & Potholes",
+          desc: "Voice-reported deep road crater causing traffic bottleneck and two-wheeler skids near Flower Market.",
+          location: "Flower Market Main Road, RS Puram, Coimbatore",
+          photo: "pothole"
+        },
+        water: {
+          transcript: "This is Priya from Ward 18 Saibaba Colony. Clean water pipeline is leaking heavily on NSR Road.",
+          name: "Priya Dharshini",
+          contact: "+91 98422 11045",
+          ward: "Ward 18, Saibaba Colony",
+          title: "Major drinking water pipeline leak on NSR Road",
+          category: "Water & Drainage",
+          desc: "Voice-reported underground water main leakage flooding NSR Road junction since morning.",
+          location: "NSR Road, Saibaba Colony, Coimbatore",
+          photo: "water"
+        },
+        garbage: {
+          transcript: "I am Aravind from Ward 36 Peelamedu. Garbage bins are overflowing near Hopes College signal.",
+          name: "Aravind Swaminathan",
+          contact: "aravind.civic@gmail.com",
+          ward: "Ward 36, Peelamedu",
+          title: "Overflowing garbage bins near Hopes College signal",
+          category: "Garbage & Sanitation",
+          desc: "Voice-reported uncollected municipal solid waste overflowing onto pedestrian walkway.",
+          location: "Avinashi Road, Hopes College, Peelamedu",
+          photo: "garbage"
+        }
+      };
+
+      const data = samples[preset] || samples.pothole;
+      state.manualCategoryLocked = false;
+      document.getElementById('voiceTranscriptText').textContent = `"${data.transcript}"`;
+      document.getElementById('citizenNameInput').value = data.name;
+      document.getElementById('citizenContactInput').value = data.contact;
+      document.getElementById('citizenWardInput').value = data.ward;
+      document.getElementById('issueTitleInput').value = data.title;
+      document.getElementById('issueCategoryInput').value = data.category;
+      document.getElementById('issueDescInput').value = data.desc;
+      document.getElementById('issueLocationInput').value = data.location;
+      selectSamplePhoto(data.photo);
+      runGeminiAiAnalysis(false);
+      speakAssistantGuide("I have filled in your complaint details and classified the priority with Gemini AI. Please review and click Submit Official Complaint.");
+      showToast('Voice Assistant auto-filled & classified your complaint!', 'success');
+    }
+
+    function applyVoiceTranscriptToForm(text) {
+      state.manualCategoryLocked = false;
+      if (!document.getElementById('citizenNameInput').value) document.getElementById('citizenNameInput').value = 'Karthik Subramanian';
+      if (!document.getElementById('citizenContactInput').value) document.getElementById('citizenContactInput').value = '+91 98422 11045';
+      if (!document.getElementById('citizenWardInput').value) document.getElementById('citizenWardInput').value = 'Ward 24, Coimbatore';
+      document.getElementById('issueTitleInput').value = text.slice(0, 75);
+      document.getElementById('issueDescInput').value = text;
+      if (!document.getElementById('issueLocationInput').value) document.getElementById('issueLocationInput').value = 'Gandhipuram Central, Coimbatore';
+      runGeminiAiAnalysis(true);
+    }
+
+    // -----------------------------------------------------------------------
+    // 11. MODALS: ISSUE DETAILS, ADMIN RESOLUTION & 2-STEP OTP LOGINS
+    // -----------------------------------------------------------------------
+    function openIssueModal(id) {
+      const issue = state.issues.find(i => i.id === id);
+      if (!issue) return;
+
+      document.getElementById('modalTicketId').textContent = issue.id;
+      document.getElementById('modalTitle').textContent = issue.title;
+      document.getElementById('issueDetailModalBody').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-2">
+            ${getStatusBadgeHtml(issue.status)}
+            ${getPriorityBadgeHtml(issue.severity)}
+            ${getDaysExistingBadgeHtml(issue)}
+            <span class="text-xs font-bold text-slate-600">${issue.department}</span>
+          </div>
+          <span class="text-xs text-slate-500">Reported by <strong>${issue.citizenName}</strong> (${issue.citizenWard || 'Verified Ward'})</span>
+        </div>
+
+        <p class="text-sm text-slate-700 leading-relaxed">${issue.description}</p>
+
+        ${issue.aiReasoning ? `
+          <div class="p-3 rounded-xl bg-indigo-50 border border-indigo-200 text-xs text-indigo-950 flex items-start gap-2">
+            <i class="fa-solid fa-sparkles text-indigo-600 mt-0.5"></i>
+            <div><strong>Gemini AI Classification &amp; Priority Analysis:</strong> ${issue.aiReasoning}</div>
+          </div>
+        ` : ''}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="space-y-1.5">
+            <div class="text-xs font-bold uppercase text-slate-500">Before (Citizen Evidence)</div>
+            <img src="${issue.beforePhoto}" alt="Before" class="w-full h-44 object-cover rounded-xl border border-slate-200" />
+          </div>
+          <div class="space-y-1.5">
+            <div class="text-xs font-bold uppercase text-emerald-700">After (Official Verification Proof)</div>
+            ${issue.afterPhoto
+              ? `<img src="${issue.afterPhoto}" alt="After" class="w-full h-44 object-cover rounded-xl border border-emerald-300" />`
+              : `<div class="w-full h-44 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center text-xs text-slate-400 p-4 text-center">
+                   <i class="fa-solid fa-hourglass-half text-xl mb-1.5"></i>
+                   <span>Awaiting municipal completion photo</span>
+                 </div>`
+            }
+          </div>
+        </div>
+
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Immutable Audit &amp; Status Timeline</h4>
+          <div class="space-y-2">
+            ${issue.timeline.map(t => `
+              <div class="flex items-start gap-2.5 text-xs bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <span class="font-bold text-blue-700 shrink-0">${t.time}:</span>
+                <span class="text-slate-700">${t.text}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('issueDetailModal').classList.remove('hidden');
+    }
+
+    function openResolveModal(id) {
+      const issue = state.issues.find(i => i.id === id);
+      if (!issue) return;
+      state.uploadedAfterPhoto = null;
+      document.getElementById('resolveTicketId').value = id;
+      document.getElementById('resolveNewStatus').value = issue.status === 'Reported' ? 'In Progress' : 'Resolved';
+
+      const signedOfficer = state.authorityOfficer
+        ? `${state.authorityOfficer.name} (${state.authorityOfficer.designation}, ID: ${state.authorityOfficer.empId})`
+        : issue.officer;
+      document.getElementById('resolveOfficerInput').value = signedOfficer;
+      document.getElementById('resolveRemarksInput').value = '';
+      document.getElementById('afterPhotoStatus')?.classList.add('hidden');
+      document.getElementById('resolveActionModal').classList.remove('hidden');
+    }
+
+    function attachVerifiedAfterPreset() {
+      state.uploadedAfterPhoto = SAMPLE_PHOTOS.resolved;
+      document.getElementById('afterPhotoStatus')?.classList.remove('hidden');
+      showToast('Verified field crew completion photo attached!', 'success');
+    }
+
+    function handleAfterPhotoUpload(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        state.uploadedAfterPhoto = e.target.result;
+        document.getElementById('afterPhotoStatus')?.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function submitAuthorityResolution(event) {
+      event.preventDefault();
+      const id = document.getElementById('resolveTicketId').value;
+      const newStatus = document.getElementById('resolveNewStatus').value;
+      const officer = document.getElementById('resolveOfficerInput').value.trim();
+      const remarks = document.getElementById('resolveRemarksInput').value.trim();
+
+      const issue = state.issues.find(i => i.id === id);
+      if (!issue) return;
+
+      issue.status = newStatus;
+      issue.officer = officer;
+      if (newStatus === 'Resolved') {
+        issue.afterPhoto = state.uploadedAfterPhoto || SAMPLE_PHOTOS.resolved;
+        issue.resolvedAt = new Date().toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        issue.resolutionRemarks = remarks;
+        state.lastResolvedIssueId = id;
+      }
+      issue.timeline.push({
+        time: 'Just now',
+        text: `[${newStatus}] signed by ${officer}: ${remarks}`
+      });
+
+      closeModal('resolveActionModal');
+      updateGlobalStats();
+      switchAuthoritySubPage('queue');
+      renderAdminDashboard();
+      renderCitizenFeed();
+      renderMyAppliedComplaints();
+
+      if (newStatus === 'Resolved') {
+        const resolvedCard = document.getElementById(`resolved-card-${id}`);
+        if (resolvedCard) {
+          resolvedCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        showToast(`Ticket ${id} marked Resolved & moved to the Resolved Evidence column!`, 'success');
+      } else {
+        showToast(`Ticket ${id} status updated to ${newStatus}!`, 'success');
+      }
+    }
+
+    let pendingAuthorityOfficer = null;
+
+    function openLoginModal(role = 'citizen') {
+      selectOtpLoginRole(role);
+      document.getElementById('otpAuthModal')?.classList.remove('hidden');
+    }
+
+    function selectOtpLoginRole(role) {
+      state.otpSelectedRole = role;
+      const citizenBtn = document.getElementById('otpRoleCitizenBtn');
+      const adminBtn = document.getElementById('otpRoleAdminBtn');
+      const citizenSec = document.getElementById('citizenLoginSection');
+      const adminSec = document.getElementById('authorityLoginSection');
+      const titleEl = document.getElementById('loginModalHeaderTitle');
+      const iconEl = document.getElementById('loginModalHeaderIcon');
+
+      if (role === 'admin') {
+        adminBtn.className = 'py-2 rounded-lg text-xs font-bold bg-slate-900 text-amber-300 shadow-sm flex items-center justify-center gap-1.5';
+        citizenBtn.className = 'py-2 rounded-lg text-xs font-bold text-slate-600 flex items-center justify-center gap-1.5';
+        citizenSec?.classList.add('hidden');
+        adminSec?.classList.remove('hidden');
+        backToAuthorityStep1();
+        if (titleEl) titleEl.textContent = 'Municipal Admin Login (Gov OTP)';
+        if (iconEl) iconEl.className = 'fa-solid fa-user-shield text-amber-400';
+      } else {
+        citizenBtn.className = 'py-2 rounded-lg text-xs font-bold bg-white text-blue-700 shadow-sm flex items-center justify-center gap-1.5';
+        adminBtn.className = 'py-2 rounded-lg text-xs font-bold text-slate-600 flex items-center justify-center gap-1.5';
+        adminSec?.classList.add('hidden');
+        citizenSec?.classList.remove('hidden');
+        backToCitizenStep1();
+        if (titleEl) titleEl.textContent = 'Citizen Portal Login (OTP)';
+        if (iconEl) iconEl.className = 'fa-solid fa-user text-blue-400';
+      }
+    }
+
+    function sendOtpCode() {
+      const identifier = document.getElementById('otpIdentifierInput')?.value.trim();
+      if (!identifier) {
+        showToast('Please enter your Mobile Number or Email first.', 'warning');
+        return;
+      }
+      document.getElementById('citizenOtpStep1')?.classList.add('hidden');
+      document.getElementById('citizenOtpStep2')?.classList.remove('hidden');
+      autoFillOtp();
+      showToast(`Citizen Verification OTP (482910) sent to ${identifier}`, 'info');
+    }
+
+    function autoFillOtp() {
+      const code = '482910'.split('');
+      document.querySelectorAll('.otp-digit').forEach((inp, idx) => {
+        inp.value = code[idx] || '';
+      });
+    }
+
+    function backToCitizenStep1() {
+      document.getElementById('citizenOtpStep2')?.classList.add('hidden');
+      document.getElementById('citizenOtpStep1')?.classList.remove('hidden');
+    }
+
+    function verifyCitizenOtpCode() {
+      const enteredOtp = Array.from(document.querySelectorAll('.otp-digit')).map(i => i.value.trim()).join('');
+      if (enteredOtp.length < 6) {
+        showToast('Please enter the 6-digit Citizen OTP (482910).', 'warning');
+        return;
+      }
+      const identifier = document.getElementById('otpIdentifierInput').value.trim();
+      const cName = document.getElementById('citizenLoginNameInput')?.value.trim() || 'Verified Citizen';
+      const cWard = document.getElementById('citizenLoginWardInput')?.value.trim() || '';
+
+      state.loggedInUser = { role: 'citizen', name: cName, identifier, ward: cWard };
+      closeModal('otpAuthModal');
+      updateHeaderLoginPill();
+
+      const nameInput = document.getElementById('citizenNameInput');
+      const contactInput = document.getElementById('citizenContactInput');
+      const wardInput = document.getElementById('citizenWardInput');
+      const lookupInput = document.getElementById('myIssuesLookupInput');
+
+      if (nameInput && cName) nameInput.value = cName;
+      if (contactInput && identifier) contactInput.value = identifier;
+      if (wardInput && cWard) wardInput.value = cWard;
+      if (lookupInput && identifier) lookupInput.value = identifier;
+      document.getElementById('citizenVerifiedBadge')?.classList.remove('hidden');
+
+      updateGlobalStats();
+      showToast(`Citizen OTP Verified! Signed in as ${cName}`, 'success');
+    }
+
+    function fillDemoAuthorityLoginModal() {
+      document.getElementById('modalAuthNameInput').value = 'Er. R. Karthikeyan';
+      document.getElementById('modalAuthDesignationInput').value = 'Assistant Executive Engineer (AEE)';
+      document.getElementById('modalAuthEmpIdInput').value = 'TN-CCMC-4082';
+      document.getElementById('modalAuthDeptInput').value = 'ALL';
+      document.getElementById('modalAuthZoneInput').value = 'Central Zone (Wards 20–40)';
+      document.getElementById('modalAuthContactInput').value = 'karthikeyan.aee@tn.gov.in';
+      showToast('Sample Admin ID filled!', 'info');
+    }
+
+    function sendAuthorityOtpCode(event) {
+      event.preventDefault();
+      const name = document.getElementById('modalAuthNameInput').value.trim();
+      const designation = document.getElementById('modalAuthDesignationInput').value.trim();
+      const empId = document.getElementById('modalAuthEmpIdInput').value.trim();
+      const department = document.getElementById('modalAuthDeptInput').value;
+      const zone = document.getElementById('modalAuthZoneInput').value.trim();
+      const contact = document.getElementById('modalAuthContactInput').value.trim();
+
+      pendingAuthorityOfficer = { name, designation, empId, department, zone, contact };
+      const targetEl = document.getElementById('authOtpTargetDisplay');
+      if (targetEl) targetEl.textContent = contact;
+
+      document.getElementById('authorityOtpStep1')?.classList.add('hidden');
+      document.getElementById('authorityOtpStep2')?.classList.remove('hidden');
+      autoFillAuthorityOtp();
+      showToast(`Official Gov OTP (739154) sent to ${contact}`, 'info');
+    }
+
+    function autoFillAuthorityOtp() {
+      const code = '739154'.split('');
+      document.querySelectorAll('.auth-otp-digit').forEach((inp, idx) => {
+        inp.value = code[idx] || '';
+      });
+    }
+
+    function backToAuthorityStep1() {
+      document.getElementById('authorityOtpStep2')?.classList.add('hidden');
+      document.getElementById('authorityOtpStep1')?.classList.remove('hidden');
+    }
+
+    function verifyAuthorityOtpCode() {
+      const enteredOtp = Array.from(document.querySelectorAll('.auth-otp-digit')).map(i => i.value.trim()).join('');
+      if (enteredOtp.length < 6) {
+        showToast('Please enter the 6-digit Official Gov OTP (739154).', 'warning');
+        return;
+      }
+      if (!pendingAuthorityOfficer) return;
+
+      state.authorityOfficer = { ...pendingAuthorityOfficer };
+      state.loggedInUser = { role: 'admin', identifier: `${pendingAuthorityOfficer.name} (${pendingAuthorityOfficer.empId})` };
+      closeModal('otpAuthModal');
+      updateHeaderLoginPill();
+      navigateToPage('authority');
+      showToast(`Gov OTP Verified! Signed in as ${pendingAuthorityOfficer.name} (${pendingAuthorityOfficer.empId})`, 'success');
+    }
+
+    function logoutCurrentUser() {
+      state.loggedInUser = null;
+      state.authorityOfficer = null;
+      const authCtrl = document.getElementById('authHeaderControl');
+      if (authCtrl) {
+        authCtrl.innerHTML = `
+          <button onclick="openLoginModal('citizen')" class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-user"></i>
+            <span>Citizen Login</span>
+          </button>
+          <button onclick="openLoginModal('admin')" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-700 text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>Admin Login</span>
+          </button>
+        `;
+      }
+      if (state.activePage === 'authority') renderAuthorityPortalView();
+      showToast('Signed out successfully.', 'info');
+    }
+
+    function updateHeaderLoginPill() {
+      const authCtrl = document.getElementById('authHeaderControl');
+      if (!authCtrl || !state.loggedInUser) return;
+
+      if (state.loggedInUser.role === 'admin' && state.authorityOfficer) {
+        authCtrl.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <button onclick="openLoginModal('admin')" class="px-3 py-2 rounded-xl bg-slate-900 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-user-shield"></i>
+              <span>${state.authorityOfficer.name} (${state.authorityOfficer.empId})</span>
+            </button>
+            <button onclick="logoutCurrentUser()" title="Sign Out" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 text-xs font-bold">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        `;
+      } else {
+        authCtrl.innerHTML = `
+          <div class="flex items-center gap-1.5">
+            <button onclick="openLoginModal('citizen')" class="px-3 py-2 rounded-xl bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-blue-600"></i>
+              <span>${state.loggedInUser.name || state.loggedInUser.identifier}</span>
+            </button>
+            <button onclick="logoutCurrentUser()" title="Sign Out" class="px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 text-xs font-bold">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId)?.classList.add('hidden');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const colors = {
+        success: 'bg-emerald-900 border-emerald-700 text-white',
+        warning: 'bg-amber-900 border-amber-700 text-white',
+        info: 'bg-slate-900 border-slate-700 text-white'
+      };
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto px-4 py-3 rounded-xl border shadow-lg text-xs font-semibold flex items-center justify-between gap-3 transition-all ${colors[type] || colors.info}`;
+      toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()" class="text-white/70 hover:text-white"><i class="fa-solid fa-xmark"></i></button>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4200);
+    }
+
+    // -----------------------------------------------------------------------
+    // 12. INTERACTIVE APP GUIDE ASSISTANT (MULTI-PAGE WALKTHROUGH)
+    // -----------------------------------------------------------------------
+    const APP_TOUR_STEPS = [
+      {
+        title: "Step 1 of 5: Google Map Page",
+        text: "Click any problem pointer on Google Maps or any street card below to zoom straight to that exact street.",
+        action: () => navigateToPage('map')
+      },
+      {
+        title: "Step 2 of 5: Report Issue & Gemini AI Triage",
+        text: "Enter title, description, location, category, and optional photo—Google Gemini AI automatically classifies category, priority urgency, and department.",
+        action: () => navigateToPage('report')
+      },
+      {
+        title: "Step 3 of 5: Issue Tracking Dashboard",
+        text: "Track submitted complaints across Reported, In Progress, and Resolved statuses, see days existing, or download Official Receipts.",
+        action: () => navigateToPage('myissues')
+      },
+      {
+        title: "Step 4 of 5: Public Feed Page",
+        text: "Validate neighborhood issues (+5 Impact Points) and inspect Before/After photographic evidence.",
+        action: () => navigateToPage('feed')
+      },
+      {
+        title: "Step 5 of 5: Admin Dashboard",
+        text: "Municipal administrators sign in with individual credentials & Gov OTP, manage Active vs. Resolved Evidence columns, and print Ward Audit Reports.",
+        action: () => navigateToPage('authority')
+      }
+    ];
+
+    let currentTourStepIndex = -1;
+    let lastGuideSpokenText = "Welcome to CivicResolve! Submit civic complaints with Google Gemini AI classification, priority detection, and department routing, then track them across Reported, In Progress, and Resolved stages.";
+
+    function toggleAppGuide(forceState) {
+      const panel = document.getElementById('appGuidePanel');
+      if (!panel) return;
+      const shouldOpen = typeof forceState === 'boolean' ? forceState : panel.classList.contains('hidden');
+      if (shouldOpen) {
+        panel.classList.remove('hidden');
+        const msgBox = document.getElementById('appGuideMessages');
+        if (msgBox && msgBox.children.length === 0) {
+          appendGuideMessage('assistant', lastGuideSpokenText);
+        }
+      } else {
+        panel.classList.add('hidden');
+      }
+    }
+
+    function appendGuideMessage(sender, text, ctaLabel = null, ctaFnName = null) {
+      const msgBox = document.getElementById('appGuideMessages');
+      if (!msgBox) return;
+      const wrapper = document.createElement('div');
+      wrapper.className = sender === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+      const bubble = document.createElement('div');
+      bubble.className = sender === 'user'
+        ? 'bg-blue-600 text-white rounded-2xl rounded-br-sm px-3.5 py-2.5 max-w-[85%] shadow-sm leading-relaxed'
+        : 'bg-white text-slate-700 border border-slate-200 rounded-2xl rounded-bl-sm px-3.5 py-2.5 max-w-[92%] shadow-sm space-y-2 leading-relaxed';
+
+      bubble.innerHTML = `<div>${text}</div>`;
+
+      if (ctaLabel && ctaFnName) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'mt-1.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-blue-600 text-white text-[11px] font-bold transition';
+        btn.innerHTML = `<span>${ctaLabel}</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>`;
+        btn.onclick = () => window[ctaFnName]();
+        bubble.appendChild(btn);
+      }
+
+      wrapper.appendChild(bubble);
+      msgBox.appendChild(wrapper);
+      msgBox.scrollTop = msgBox.scrollHeight;
+      if (sender === 'assistant') {
+        lastGuideSpokenText = text.replace(/<[^>]*>/g, '');
+      }
+    }
+
+    function nextGuideStep() {
+      currentTourStepIndex = (currentTourStepIndex + 1) % APP_TOUR_STEPS.length;
+      applyTourStep(currentTourStepIndex);
+    }
+
+    function prevGuideStep() {
+      currentTourStepIndex = (currentTourStepIndex - 1 + APP_TOUR_STEPS.length) % APP_TOUR_STEPS.length;
+      applyTourStep(currentTourStepIndex);
+    }
+
+    function applyTourStep(idx) {
+      const step = APP_TOUR_STEPS[idx];
+      if (!step) return;
+      step.action();
+
+      const label = document.getElementById('guideTourStepLabel');
+      const prevBtn = document.getElementById('guidePrevBtn');
+      const nextBtn = document.getElementById('guideNextBtn');
+
+      if (label) label.textContent = step.title;
+      if (prevBtn) prevBtn.classList.remove('hidden');
+      if (nextBtn) nextBtn.textContent = idx === APP_TOUR_STEPS.length - 1 ? 'Restart Tour ↻' : 'Next Step →';
+
+      appendGuideMessage('assistant', `<strong>${step.title}</strong><br>${step.text}`);
+    }
+
+    function handleGuideQuickAction(topic) {
+      toggleAppGuide(true);
+      const responses = {
+        report: {
+          q: "How does Gemini AI classify my complaint?",
+          a: "Open the <strong>Report Issue</strong> page, enter your title, description, and location, and click <strong>Analyze with Gemini</strong>—it auto-detects category, priority urgency, and department.",
+          cta: "Go to Report Page",
+          fn: "guideGoReport"
+        },
+        voice: {
+          q: "How does the Voice Assistant work?",
+          a: "On the <strong>Report Issue</strong> page, tap <strong>Start Speaking</strong> (or click a Voice Demo) and AI fills out and classifies your complaint automatically!",
+          cta: "Open Voice Assistant",
+          fn: "openVoiceReportAssistant"
+        },
+        track: {
+          q: "Where can I track Reported, In Progress & Resolved issues?",
+          a: "Open the <strong>Issue Tracking</strong> page to filter by status, check how many days each complaint has existed, print your <strong>Official Receipt</strong>, or withdraw a Reported ticket.",
+          cta: "Go to Issue Tracking",
+          fn: "guideGoMyIssues"
+        },
+        map: {
+          q: "How do I use the Google Map page?",
+          a: "Open the <strong>Google Map</strong> page to click any problem pointer on the map or any street card underneath.",
+          cta: "Go to Google Map",
+          fn: "guideGoMap"
+        },
+        authority: {
+          q: "How do Admins manage and resolve issues?",
+          a: "Click <strong>Admin Login</strong> or open the <strong>Admin Dashboard</strong> page to verify via Gov OTP, update status (Reported → In Progress → Resolved), and archive Before/After evidence.",
+          cta: "Open Admin Dashboard",
+          fn: "guideGoAuthority"
+        }
+      };
+
+      const item = responses[topic];
+      if (!item) return;
+      appendGuideMessage('user', item.q);
+      setTimeout(() => appendGuideMessage('assistant', item.a, item.cta, item.fn), 180);
+    }
+
+    function guideGoReport() { navigateToPage('report'); }
+    function guideGoMyIssues() { navigateToPage('myissues'); }
+    function guideGoMap() { navigateToPage('map'); }
+    function guideGoAuthority() { navigateToPage('authority'); }
+
+    function submitAppGuideQuestion(event) {
+      event.preventDefault();
+      const input = document.getElementById('appGuideInput');
+      const q = (input.value || '').trim();
+      if (!q) return;
+      input.value = '';
+      appendGuideMessage('user', q);
+
+      const lower = q.toLowerCase();
+      setTimeout(() => {
+        if (/(voice|speak|mic)/.test(lower)) {
+          appendGuideMessage('assistant', "Use our <strong>AI Voice Complaint Assistant</strong> on the Report Issue page!", "Open Voice Assistant", "openVoiceReportAssistant");
+        } else if (/(my|track|applied|receipt|status|day)/.test(lower)) {
+          appendGuideMessage('assistant', "Track all complaints across Reported, In Progress, and Resolved—including the exact number of days existing—on the <strong>Issue Tracking</strong> page.", "Go to Issue Tracking", "guideGoMyIssues");
+        } else if (/(map|google|pointer)/.test(lower)) {
+          appendGuideMessage('assistant', "Explore all street pointers on the dedicated <strong>Google Map</strong> page.", "Go to Google Map", "guideGoMap");
+        } else if (/(admin|authority|officer|details)/.test(lower)) {
+          appendGuideMessage('assistant', "Municipal administrators sign in with individual credentials on the <strong>Admin Dashboard</strong> page.", "Open Admin Dashboard", "guideGoAuthority");
+        } else {
+          appendGuideMessage('assistant', "Tap any page link in the top header or start our 5-step guided tour!", "Start Step 1 of Tour", "nextGuideStep");
+        }
+      }, 200);
+    }
+
+    function readCurrentGuideAloud() {
+      speakAssistantGuide(lastGuideSpokenText);
+    }
+
+    // Initialize Application on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateGlobalStats();
+      navigateToPage('map');
+    });
+  </script>
+</body>
+</html>
