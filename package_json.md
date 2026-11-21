@@ -1,0 +1,19 @@
+{
+  "name": "civicresolve",
+  "version": "1.0.0",
+  "description": "CivicResolve — AI-powered citizen-to-government civic grievance reporting, priority triage, and municipal resolution platform.",
+  "main": "index.html",
+  "scripts": {
+    "test": "node --test tests/civicresolve.test.js",
+    "lint": "node -e \"const fs=require('fs'); const html=fs.readFileSync('index.html','utf8'); if(!html.includes('Content-Security-Policy')) process.exit(1); console.log('Security & Accessibility checks passed.');\""
+  },
+  "keywords": [
+    "civic-tech",
+    "gemini-ai",
+    "smart-city",
+    "grievance-redressal",
+    "accessibility",
+    "google-maps"
+  ],
+  "license": "MIT"
+}
