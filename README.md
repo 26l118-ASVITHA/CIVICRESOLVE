@@ -1,6 +1,6 @@
 # CivicResolve — AI-Powered Citizen-to-Government Civic Grievance Platform
 
-🌐 **Live Demo:** [https://261118-asvitha.github.io/CIVICRESOLVE/](https://261118-asvitha.github.io/CIVICRESOLVE/)
+🌐 **Live Demo:** https://26l118-asvitha.github.io/CIVICRESOLVE/
 
 > **GitHub Repository Description:**
 > *AI-powered civic grievance platform using Google Gemini triage, live Google Maps pointers, voice reporting, SLA tracking, and photo resolution proof.*
